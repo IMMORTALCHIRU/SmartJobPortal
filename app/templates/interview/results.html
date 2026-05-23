@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Interview Results - Interview Prep Tracker{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 sidebar-col">
+                {% include 'components/sidebar.html' %}
+            </div>
+            
+            <div class="col-lg-10 main-content-col">
+                <div class="dashboard-content">
+                    <div class="results-header">
+                        <div class="results-title">
+                            <h1><i class="bi bi-clipboard-data"></i> Interview Results</h1>
+                            <p>{{ interview.interview_type }} • {{ interview.difficulty|capitalize }} Difficulty</p>
+                        </div>
+                        <div class="results-actions">
+                            <a href="{{ url_for('interview.schedule') }}" class="btn btn-primary">
+                                <i class="bi bi-arrow-repeat"></i> Take Another
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Score Card -->
+                    <div class="results-score-card animate__animated animate__fadeInUp">
+                        <div class="score-visual">
+                            <div class="score-circle {{ 'excellent' if interview.score >= 80 else 'good' if interview.score >= 60 else 'average' if interview.score >= 40 else 'poor' }}">
+                                <svg viewBox="0 0 36 36" class="circular-chart">
+                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="circle" stroke-dasharray="{{ interview.score }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <text x="18" y="20.35" class="percentage">{{ interview.score }}%</text>
+                                </svg>
+                            </div>
+                            <h2 class="score-label">
+                                {% if interview.score >= 80 %}Excellent! 🎉
+                                {% elif interview.score >= 60 %}Good Job! 👍
+                                {% elif interview.score >= 40 %}Keep Practicing! 💪
+                                {% else %}Needs Improvement 📚{% endif %}
+                            </h2>
+                        </div>
+                        
+                        <div class="score-stats">
+                            <div class="stat">
+                                <i class="bi bi-check-circle text-success"></i>
+                                <span class="value">{{ interview.correct_answers }}</span>
+                                <span class="label">Correct</span>
+                            </div>
+                            <div class="stat">
+                                <i class="bi bi-x-circle text-danger"></i>
+                                <span class="value">{{ interview.total_questions - interview.correct_answers }}</span>
+                                <span class="label">Incorrect</span>
+                            </div>
+                            <div class="stat">
+                                <i class="bi bi-clock text-info"></i>
+                                <span class="value">{{ (interview.time_taken // 60)|int }}:{{ '%02d'|format(interview.time_taken % 60) }}</span>
+                                <span class="label">Time Taken</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <!-- Feedback Section -->
+                        {% if feedback %}
+                        <div class="col-xl-6">
+                            <div class="dashboard-card h-100">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-robot"></i> AI Feedback</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p class="feedback-summary">{{ feedback.feedback_summary }}</p>
+                                    
+                                    {% if feedback.strong_topics %}
+                                    <div class="feedback-section">
+                                        <h4><i class="bi bi-hand-thumbs-up text-success"></i> Strong Areas</h4>
+                                        <div class="topics-list">
+                                            {% for topic in feedback.strong_topics %}
+                                            <span class="topic-tag success">{{ topic }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if feedback.weak_topics %}
+                                    <div class="feedback-section">
+                                        <h4><i class="bi bi-exclamation-triangle text-warning"></i> Areas to Improve</h4>
+                                        <div class="topics-list">
+                                            {% for topic in feedback.weak_topics %}
+                                            <span class="topic-tag warning">{{ topic }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Improvement Suggestions -->
+                        <div class="col-xl-6">
+                            <div class="dashboard-card h-100">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-lightbulb"></i> Improvement Suggestions</h3>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="suggestions-list">
+                                        {% for suggestion in feedback.improvement_suggestions %}
+                                        <li>
+                                            <i class="bi bi-arrow-right-circle"></i>
+                                            {{ suggestion }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Detailed Results -->
+                        <div class="col-12">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-list-check"></i> Question Review</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="questions-review">
+                                        {% for result in results %}
+                                        <div class="review-item {{ 'correct' if result.is_correct else 'incorrect' }}">
+                                            <div class="review-header">
+                                                <span class="q-number">Q{{ loop.index }}</span>
+                                                <span class="status-badge {{ 'bg-success' if result.is_correct else 'bg-danger' }}">
+                                                    {{ 'Correct' if result.is_correct else 'Incorrect' }}
+                                                </span>
+                                            </div>
+                                            <div class="review-question">{{ result.question.question_text }}</div>
+                                            <div class="review-answers">
+                                                <div class="answer user-answer {{ 'correct' if result.is_correct else 'incorrect' }}">
+                                                    <span class="label">Your Answer:</span>
+                                                    <span class="value">{{ result.user_answer or 'Not answered' }}</span>
+                                                </div>
+                                                {% if not result.is_correct %}
+                                                <div class="answer correct-answer">
+                                                    <span class="label">Correct Answer:</span>
+                                                    <span class="value">{{ result.question.correct_answer }}</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% if result.question.explanation %}
+                                            <div class="explanation">
+                                                <i class="bi bi-info-circle"></i>
+                                                {{ result.question.explanation }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

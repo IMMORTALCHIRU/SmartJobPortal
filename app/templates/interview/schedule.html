@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Interview - Interview Prep Tracker{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 sidebar-col">
+                {% include 'components/sidebar.html' %}
+            </div>
+            
+            <div class="col-lg-10 main-content-col">
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <h1><i class="bi bi-calendar-plus"></i> Schedule Mock Interview</h1>
+                        <p>Choose an interview type and difficulty to start practicing</p>
+                    </div>
+                    
+                    <form method="POST" class="schedule-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <!-- Interview Type Selection -->
+                        <div class="form-section">
+                            <h3><i class="bi bi-grid"></i> Select Interview Type</h3>
+                            
+                            {% if recommended_types %}
+                            <div class="recommended-badge mb-3">
+                                <i class="bi bi-stars"></i> Recommended for you based on your resume
+                            </div>
+                            {% endif %}
+                            
+                            <div class="interview-types-grid">
+                                {% for itype in interview_types %}
+                                <label class="interview-type-card {{ 'recommended' if itype in recommended_types else '' }}">
+                                    <input type="radio" name="interview_type" value="{{ itype }}" required>
+                                    <div class="card-content">
+                                        <div class="type-icon">
+                                            {% if 'Data Structures' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/tree-structure.png" alt="DSA">
+                                            {% elif 'Web' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/source-code.png" alt="Web">
+                                            {% elif 'Machine Learning' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/brain.png" alt="ML">
+                                            {% elif 'System Design' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/system-task.png" alt="System">
+                                            {% elif 'Database' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/database.png" alt="DB">
+                                            {% elif 'Python' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/python.png" alt="Python">
+                                            {% elif 'JavaScript' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/javascript.png" alt="JS">
+                                            {% elif 'DevOps' in itype %}
+                                            <img src="https://img.icons8.com/fluency/48/cloud-development.png" alt="DevOps">
+                                            {% else %}
+                                            <img src="https://img.icons8.com/fluency/48/code.png" alt="Code">
+                                            {% endif %}
+                                        </div>
+                                        <h4>{{ itype }}</h4>
+                                        {% if itype in recommended_types %}
+                                        <span class="rec-badge">Recommended</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="check-indicator">
+                                        <i class="bi bi-check-lg"></i>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Difficulty & Questions -->
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-section">
+                                    <h3><i class="bi bi-speedometer2"></i> Difficulty Level</h3>
+                                    <div class="difficulty-options">
+                                        <label class="difficulty-card">
+                                            <input type="radio" name="difficulty" value="easy">
+                                            <div class="card-content">
+                                                <span class="diff-icon easy">🟢</span>
+                                                <h4>Easy</h4>
+                                                <p>Good for beginners</p>
+                                            </div>
+                                        </label>
+                                        <label class="difficulty-card">
+                                            <input type="radio" name="difficulty" value="medium" checked>
+                                            <div class="card-content">
+                                                <span class="diff-icon medium">🟡</span>
+                                                <h4>Medium</h4>
+                                                <p>Standard interview level</p>
+                                            </div>
+                                        </label>
+                                        <label class="difficulty-card">
+                                            <input type="radio" name="difficulty" value="hard">
+                                            <div class="card-content">
+                                                <span class="diff-icon hard">🔴</span>
+                                                <h4>Hard</h4>
+                                                <p>For advanced prep</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-section">
+                                    <h3><i class="bi bi-list-ol"></i> Number of Questions</h3>
+                                    <div class="question-count-selector">
+                                        <input type="range" class="form-range" id="questionCount" name="question_count" 
+                                               min="5" max="20" value="10" step="5">
+                                        <div class="count-labels">
+                                            <span>5</span>
+                                            <span>10</span>
+                                            <span>15</span>
+                                            <span>20</span>
+                                        </div>
+                                        <div class="selected-count">
+                                            <span id="countDisplay">10</span> Questions
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit -->
+                        <div class="schedule-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-play-circle"></i> Start Interview
+                            </button>
+                            <p class="action-note">You'll be asked {{ '<span id="countNote">10</span>' | safe }} multiple-choice questions</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const questionCount = document.getElementById('questionCount');
+    const countDisplay = document.getElementById('countDisplay');
+    const countNote = document.getElementById('countNote');
+    
+    questionCount.addEventListener('input', function() {
+        countDisplay.textContent = this.value;
+        countNote.textContent = this.value;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Analysis - Interview Prep Tracker{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 sidebar-col">
+                {% include 'components/sidebar.html' %}
+            </div>
+            
+            <div class="col-lg-10 main-content-col">
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <div>
+                            <h1><i class="bi bi-file-earmark-check"></i> Resume Analysis</h1>
+                            <p>AI-powered analysis of your resume</p>
+                        </div>
+                        <a href="{{ url_for('resume.upload') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-repeat"></i> Analyze Another
+                        </a>
+                    </div>
+                    
+                    <!-- Score Overview -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="analysis-score-card">
+                                <div class="score-circle large">
+                                    <svg viewBox="0 0 36 36" class="circular-chart {{ 'excellent' if resume.resume_score >= 80 else 'good' if resume.resume_score >= 60 else 'average' if resume.resume_score >= 40 else 'poor' }}">
+                                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circle" stroke-dasharray="{{ resume.resume_score }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <text x="18" y="20.35" class="percentage">{{ resume.resume_score }}%</text>
+                                    </svg>
+                                </div>
+                                <h3>Resume Score</h3>
+                                <p class="score-status">
+                                    {% if resume.resume_score >= 80 %}Excellent
+                                    {% elif resume.resume_score >= 60 %}Good
+                                    {% elif resume.resume_score >= 40 %}Average
+                                    {% else %}Needs Work{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6">
+                            <div class="info-card">
+                                <div class="info-icon">
+                                    <img src="https://img.icons8.com/fluency/48/user-male-circle.png" alt="Level">
+                                </div>
+                                <div class="info-content">
+                                    <h4>Candidate Level</h4>
+                                    <span class="badge bg-{{ 'success' if resume.candidate_level == 'Experienced' else 'warning' if resume.candidate_level == 'Intermediate' else 'info' }} badge-lg">
+                                        {{ resume.candidate_level }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6">
+                            <div class="info-card">
+                                <div class="info-icon">
+                                    <img src="https://img.icons8.com/fluency/48/briefcase.png" alt="Field">
+                                </div>
+                                <div class="info-content">
+                                    <h4>Predicted Field</h4>
+                                    <span class="field-name">{{ resume.predicted_field }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6">
+                            <div class="info-card">
+                                <div class="info-icon">
+                                    <img src="https://img.icons8.com/fluency/48/calendar.png" alt="Experience">
+                                </div>
+                                <div class="info-content">
+                                    <h4>Experience</h4>
+                                    <span class="exp-years">{{ resume.experience_years }} Years</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <!-- Skills Found -->
+                        <div class="col-xl-6">
+                            <div class="dashboard-card h-100">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-stars"></i> Skills Detected ({{ resume.skills|length }})</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="skills-grid">
+                                        {% for skill in resume.skills %}
+                                        <span class="skill-tag">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recommended Skills -->
+                        <div class="col-xl-6">
+                            <div class="dashboard-card h-100">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-lightbulb"></i> Recommended Skills</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p class="recommendation-note">Adding these skills will boost your resume score and job matches:</p>
+                                    <div class="skills-grid">
+                                        {% for skill in resume.recommended_skills %}
+                                        <span class="skill-tag recommended">
+                                            <i class="bi bi-plus-circle"></i> {{ skill }}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resume Tips -->
+                        <div class="col-xl-6">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-clipboard-check"></i> Resume Sections</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="sections-checklist">
+                                        <div class="checklist-item {{ 'completed' if resume.has_objective else 'missing' }}">
+                                            <i class="bi bi-{{ 'check-circle-fill text-success' if resume.has_objective else 'x-circle-fill text-danger' }}"></i>
+                                            <span>Career Objective / Summary</span>
+                                            {% if not resume.has_objective %}
+                                            <small class="tip">Add a career objective to give recruiters context</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="checklist-item {{ 'completed' if resume.has_projects else 'missing' }}">
+                                            <i class="bi bi-{{ 'check-circle-fill text-success' if resume.has_projects else 'x-circle-fill text-danger' }}"></i>
+                                            <span>Projects</span>
+                                            {% if not resume.has_projects %}
+                                            <small class="tip">Include relevant projects to showcase your work</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="checklist-item {{ 'completed' if resume.has_achievements else 'missing' }}">
+                                            <i class="bi bi-{{ 'check-circle-fill text-success' if resume.has_achievements else 'x-circle-fill text-danger' }}"></i>
+                                            <span>Achievements</span>
+                                            {% if not resume.has_achievements %}
+                                            <small class="tip">Highlight your achievements and awards</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="checklist-item {{ 'completed' if resume.has_hobbies else 'missing' }}">
+                                            <i class="bi bi-{{ 'check-circle-fill text-success' if resume.has_hobbies else 'x-circle-fill text-danger' }}"></i>
+                                            <span>Hobbies / Interests</span>
+                                            {% if not resume.has_hobbies %}
+                                            <small class="tip">Show your personality with hobbies</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="checklist-item {{ 'completed' if resume.has_declaration else 'missing' }}">
+                                            <i class="bi bi-{{ 'check-circle-fill text-success' if resume.has_declaration else 'x-circle-fill text-danger' }}"></i>
+                                            <span>Declaration</span>
+                                            {% if not resume.has_declaration %}
+                                            <small class="tip">Add a declaration to verify authenticity</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Job Role Recommendations -->
+                        <div class="col-xl-6">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-briefcase"></i> Job Role Matches</h3>
+                                </div>
+                                <div class="card-body">
+                                    {% if recommendations and recommendations.recommended_roles %}
+                                    <div class="role-recommendations">
+                                        {% for role in recommendations.recommended_roles %}
+                                        <div class="role-match-item">
+                                            <div class="role-details">
+                                                <h4>{{ role.role }}</h4>
+                                                <div class="match-bar">
+                                                    <div class="match-progress" style="width: {{ role.match_score }}%"></div>
+                                                </div>
+                                            </div>
+                                            <span class="match-percentage {{ 'excellent' if role.match_score >= 70 else 'good' if role.match_score >= 50 else 'average' }}">
+                                                {{ role.match_score }}% Match
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <p class="text-muted">Job recommendations will appear after analysis</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Course Recommendations -->
+                        {% if recommendations and recommendations.recommended_courses %}
+                        <div class="col-12">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3><i class="bi bi-book"></i> Recommended Courses</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="courses-grid">
+                                        {% for course in recommendations.recommended_courses %}
+                                        <a href="{{ course.url }}" target="_blank" class="course-card">
+                                            <div class="course-platform">{{ course.platform }}</div>
+                                            <h4>{{ course.name }}</h4>
+                                            <span class="course-link">
+                                                View Course <i class="bi bi-arrow-right"></i>
+                                            </span>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- CTA Section -->
+                    <div class="analysis-cta">
+                        <h3>Ready to test your knowledge?</h3>
+                        <p>Take a mock interview based on your resume analysis</p>
+                        <a href="{{ url_for('interview.schedule') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-play-circle"></i> Start Mock Interview
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

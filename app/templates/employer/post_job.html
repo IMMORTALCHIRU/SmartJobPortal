@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Post a Job - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Post a Job</h1>
+                <p class="page-subtitle">Create a new job opening to attract candidates</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Job Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" class="form-control" placeholder="e.g. Senior Python Developer" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Field / Department <span class="text-danger">*</span></label>
+                                    <select name="field" class="form-select" required>
+                                        <option value="">Select Field</option>
+                                        {% for f in ['Technology','Finance','Healthcare','Marketing','Design','Sales','Operations','HR','Legal','Other'] %}
+                                        <option value="{{ f }}">{{ f }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Job Type <span class="text-danger">*</span></label>
+                                    <select name="job_type" class="form-select" required>
+                                        {% for t in ['Full-time','Part-time','Contract','Internship','Remote','Freelance'] %}
+                                        <option value="{{ t }}">{{ t }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Location <span class="text-danger">*</span></label>
+                                    <input type="text" name="location" class="form-control" placeholder="City, State or Remote" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Salary Range</label>
+                                    <input type="text" name="salary_range" class="form-control" placeholder="e.g. ₹8-12 LPA">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Experience Required (years)</label>
+                                    <input type="number" name="experience_required" class="form-control" min="0" max="30" value="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Education Required</label>
+                                    <select name="education_required" class="form-select">
+                                        <option value="">Any</option>
+                                        {% for e in ["High School","Diploma","Bachelor's","Master's","PhD"] %}
+                                        <option value="{{ e }}">{{ e }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Required Skills <span class="text-danger">*</span></label>
+                                    <input type="text" name="required_skills" class="form-control" placeholder="Python, Django, REST API, SQL (comma-separated)" required>
+                                    <div class="form-text">Enter skills separated by commas</div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Job Description <span class="text-danger">*</span></label>
+                                    <textarea name="description" class="form-control" rows="5" placeholder="Describe the role, responsibilities, and what you're looking for..." required></textarea>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Minimum Resume Score <span class="text-danger">*</span></label>
+                                    <input type="number" name="min_resume_score" class="form-control" min="0" max="100" value="50" required>
+                                    <div class="form-text">Candidates below this score cannot apply</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Interview Pass Score</label>
+                                    <input type="number" name="interview_criteria_score" class="form-control" min="0" max="100" value="60">
+                                    <div class="form-text">Score to pass interview round</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Application Deadline</label>
+                                    <input type="date" name="deadline" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Interview Questions</label>
+                                    <input type="number" name="num_questions" class="form-control" min="5" max="30" value="10">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Difficulty Level</label>
+                                    <select name="difficulty" class="form-select">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 pt-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <img src="https://img.icons8.com/fluency/20/send.png" alt="" style="filter:brightness(10);width:18px;height:18px"> Post Job
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card sticky-top" style="top:85px">
+                    <div class="card-body">
+                        <h5 style="font-weight:700;margin-bottom:1rem"><img src="https://img.icons8.com/fluency/20/idea.png" alt="" style="width:18px;height:18px;margin-right:8px">Tips for Better Results</h5>
+                        {% for tip in ['Set a reasonable min resume score (50-70) to get more qualified applicants','List specific skills to attract the right candidates','A clear description increases quality applications','Set a realistic application deadline','Use AI matching - candidates get matched automatically'] %}
+                        <div class="d-flex gap-2 mb-2">
+                            <img src="https://img.icons8.com/fluency/16/checkmark--v1.png" alt="" style="width:16px;height:16px;flex-shrink:0;margin-top:3px">
+                            <span style="font-size:.8125rem;color:#475569">{{ tip }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Manage Candidates - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Manage Candidates</h1>
+        </div>
+        <div class="card">
+            <div class="card-body p-0">
+                {% if candidates %}
+                <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Name</th><th>Email</th><th>Resumes</th><th>Applications</th><th>Active</th><th>Joined</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for item in candidates %}
+{% set c = item.candidate %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar avatar-sm">{{ c.get_initials() }}</div>
+                                <span style="font-weight:600;font-size:.875rem">{{ c.name }}</span>
+                            </div>
+                        </td>
+                        <td style="font-size:.875rem">{{ c.email }}</td>
+                        <td style="font-weight:600;color:#1e40af">{{ (item.resume.resume_score if item.resume else "No") }}</td>
+                        <td style="font-weight:600">{{ item.app_count or 0 }}</td>
+                        <td><span class="badge-status {% if c.is_active %}approved{% else %}rejected{% endif %}">{{ 'Active' if c.is_active else 'Suspended' }}</span></td>
+                        <td style="font-size:.8125rem;color:#94a3b8">{{ c.created_at.strftime('%b %d, %Y') if c.created_at else '-' }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form method="POST" action="{{ url_for('admin.toggle_user', user_id=c.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-sm {% if c.is_active %}btn-warning{% else %}btn-success{% endif %}">{{ 'Suspend' if c.is_active else 'Activate' }}</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=c.id) }}" onsubmit="return confirm('Delete this candidate?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty-state py-5">
+                    <img src="https://img.icons8.com/fluency/96/conference-call.png" alt="">
+                    <h4>No Candidates Yet</h4>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

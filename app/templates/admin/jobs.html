@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Manage Jobs - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">All Job Postings</h1>
+        </div>
+        <div class="card">
+            <div class="card-body p-0">
+                {% if jobs %}
+                <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Title</th><th>Employer</th><th>Field</th><th>Location</th><th>Min Score</th><th>Applicants</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for item in jobs %}
+{% set job = item.job %}
+                    <tr>
+                        <td style="font-weight:700">{{ job.title }}</td>
+                        <td style="font-size:.875rem">{{ item.employer.company_name if item.employer else job.company_name }}</td>
+                        <td><span class="chip">{{ job.field }}</span></td>
+                        <td style="font-size:.8125rem">{{ job.location }}</td>
+                        <td style="font-weight:700;color:#1e40af">{{ job.min_resume_score }}%</td>
+                        <td style="font-weight:700">{{ item.app_count or 0 }}</td>
+                        <td><span class="badge-status {% if job.is_active %}approved{% else %}rejected{% endif %}">{{ 'Active' if job.is_active else 'Inactive' }}</span></td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin.delete_job', job_id=job.id) }}" onsubmit="return confirm('Delete this job?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty-state py-5">
+                    <img src="https://img.icons8.com/fluency/96/briefcase.png" alt="">
+                    <h4>No Jobs Yet</h4>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

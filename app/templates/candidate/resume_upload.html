@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Upload Resume - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Upload Resume</h1>
+                <p class="page-subtitle">Get an AI-powered analysis and score</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header"><h5 class="card-title">Upload Your Resume</h5></div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label class="form-label">Resume File <span class="text-danger">*</span></label>
+                                <div id="dropZone" style="border:2px dashed #cbd5e1;border-radius:.875rem;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s;background:#f8fafc" onclick="document.getElementById('resumeFile').click()" ondragover="event.preventDefault();this.style.borderColor='#3b82f6'" ondragleave="this.style.borderColor='#cbd5e1'" ondrop="handleDrop(event)">
+                                    <img src="https://img.icons8.com/fluency/64/upload.png" alt="" style="width:64px;height:64px;margin-bottom:1rem">
+                                    <h5 style="font-weight:700;margin-bottom:.5rem">Drop your resume here</h5>
+                                    <p style="color:#64748b;font-size:.875rem;margin-bottom:1rem">or click to browse</p>
+                                    <span class="chip">PDF</span> <span class="chip">DOC</span> <span class="chip">DOCX</span>
+                                    <p id="fileName" style="margin-top:1rem;font-size:.875rem;color:#1e40af;font-weight:600"></p>
+                                </div>
+                                <input type="file" id="resumeFile" name="resume" accept=".pdf,.doc,.docx" style="display:none" onchange="showFileName(this)">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <img src="https://img.icons8.com/fluency/20/resume.png" alt="" style="filter:brightness(10);width:18px;height:18px"> Analyze Resume
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 style="font-weight:700;margin-bottom:1rem"><img src="https://img.icons8.com/fluency/20/star.png" alt="" style="width:20px;height:20px;margin-right:8px">How Scoring Works</h5>
+                        <div class="d-flex flex-column gap-2">
+                            {% for item in [('Skills Match','Relevant skills to job market','#059669'),('Experience','Years of professional experience','#1e40af'),('Education','Academic qualifications','#7c3aed'),('Certifications','Professional certifications','#d97706')] %}
+                            <div class="d-flex align-items-center gap-3 p-2" style="background:#f8fafc;border-radius:.625rem">
+                                <div style="width:8px;height:8px;border-radius:50%;background:{{ item[2] }};flex-shrink:0"></div>
+                                <div>
+                                    <div style="font-size:.875rem;font-weight:600">{{ item[0] }}</div>
+                                    <div style="font-size:.75rem;color:#64748b">{{ item[1] }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Score Ranges</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for label, color, desc in [('70-100: Excellent','#059669','Eligible for most jobs'),('50-69: Good','#d97706','Eligible for entry-level'),('0-49: Needs Work','#dc2626','Improve your resume')] %}
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span style="width:12px;height:12px;border-radius:50%;background:{{ color }};flex-shrink:0"></span>
+                            <div>
+                                <div style="font-size:.875rem;font-weight:600;color:{{ color }}">{{ label }}</div>
+                                <div style="font-size:.75rem;color:#64748b">{{ desc }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function showFileName(input){
+    if(input.files[0]) document.getElementById('fileName').textContent = '✓ ' + input.files[0].name;
+}
+function handleDrop(e){
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if(file){
+        document.getElementById('resumeFile').files = e.dataTransfer.files;
+        document.getElementById('fileName').textContent = '✓ ' + file.name;
+    }
+}
+</script>
+{% endblock %}

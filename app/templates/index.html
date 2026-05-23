@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Job Portal - AI Powered Matching{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class='hero-section text-white py-5' style='background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);'>
+    <div class='container py-5'>
+        <div class='row align-items-center'>
+            <div class='col-lg-6 mb-5 mb-lg-0'>
+                <span class='badge bg-info mb-3'>AI-Powered Job Portal</span>
+                <h1 class='display-4 fw-bold mb-4'>Find Your Dream Job with <span class='gradient-text' style='background: linear-gradient(45deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Smart Matching</span></h1>
+                <p class='lead mb-4'>Our AI-powered job matching platform connects candidates and employers using advanced scoring algorithms and automated interview systems.</p>
+                <div class='d-flex gap-3'>
+                    <a href="{{ url_for('auth.register') }}" class='btn btn-primary btn-lg px-4'>Get Started as Candidate</a>
+                    <a href="{{ url_for('auth.register_employer') }}" class='btn btn-outline-light btn-lg px-4'>Register as Recruiter</a>
+                </div>
+                <div class='mt-5 d-flex gap-4 opacity-75'>
+                    <div><h4 class='mb-0'>10K+</h4><small>Candidates</small></div>
+                    <div><h4 class='mb-0'>500+</h4><small>Companies</small></div>
+                    <div><h4 class='mb-0'>5K+</h4><small>Jobs Posted</small></div>
+                </div>
+            </div>
+            <div class='col-lg-6'>
+                <div class='row g-3'>
+                    <div class='col-5 translate-middle-y mt-5'>
+                        <div class='card bg-white text-dark p-3 rounded-4 shadow-sm h-100'>
+                            <div class='d-flex align-items-center mb-2'>
+                                <img src='https://img.icons8.com/fluency/36/resume.png' alt='resume' class='me-3' style='width:36px;height:36px'>
+                                <div>
+                                    <small class='text-muted'>Resume Analysis</small>
+                                    <div class='progress mt-2 mb-1' style='height: 4px;'><div class='progress-bar bg-success' style='width: 85%'></div></div>
+                                    <small class='fw-bold'>85% Compatibility</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-6 translate-middle-y mt-5'>
+                        <div class='card bg-white text-dark p-3 rounded-4 shadow-lg h-100'>
+                            <div class='d-flex align-items-center mb-2'>
+                                <img src='https://img.icons8.com/fluency/36/briefcase.png' alt='match' class='me-3' style='width:36px;height:36px'>
+                                <div>
+                                    <small class='text-muted'>Job Match</small>
+                                    <h3 class='text-primary mt-1 mb-0'>94%</h3>
+                                    <small class='text-success'>Strong Fit</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-6 translate-middle-y '>
+                        <div class='card bg-white text-dark p-3 rounded-4 shadow-sm h-100'>
+                            <div class='d-flex align-items-center mb-2'>
+                                <img src='https://img.icons8.com/fluency/36/questions.png' alt='interviews' class='me-3' style='width:36px;height:36px'>
+                                <div>
+                                    <small class='text-muted'>Interviews Taken</small>
+                                    <h4 class='mt-1 mb-0'>12</h4>
+                                    <small class='text-info'>This month</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-6 translate-middle-y'>
+                        <div class='card bg-white text-dark p-3 rounded-4 shadow-sm h-100'>
+                            <div class='d-flex align-items-center mb-2'>
+                                <img src='https://img.icons8.com/fluency/36/trophy.png' alt='hired' class='me-3' style='width:36px;height:36px'>
+                                <div>
+                                    <small class='text-muted'>Hired Today</small>
+                                    <h4 class='mt-1 mb-0'>24</h4>
+                                    <small class='text-warning fw-bold'>Trending</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Platform Modules -->
+<section id='modules' class='py-5'>
+    <div class='container py-5'>
+        <div class='text-center mb-5'>
+            <h2 class='fw-bold'>Platform Modules</h2>
+            <p class='text-muted'>Tailored experiences for every user</p>
+        </div>
+        <div class='row g-4'>
+            <div class='col-md-4'>
+                <div class='card h-100 border-0 shadow-sm border-top border-4 border-primary'>
+                    <div class='card-body text-center p-4'>
+                        <img src='https://img.icons8.com/fluency/64/user-male-circle.png' alt='Candidate' class='mb-3'>
+                        <h4 class='card-title fw-bold'>Candidate</h4>
+                        <ul class='list-unstyled text-start mt-4 ps-0'>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-primary me-3'>1</span>
+                                <img src='https://img.icons8.com/fluency/20/file.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Upload Resume</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-primary me-3'>2</span>
+                                <img src='https://img.icons8.com/fluency/20/artificial-intelligence.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>AI Score Analysis</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-primary me-3'>3</span>
+                                <img src='https://img.icons8.com/fluency/20/briefcase.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Job Recommendations</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-primary me-3'>4</span>
+                                <img src='https://img.icons8.com/fluency/20/questions.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Take Interviews</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-primary me-3'>5</span>
+                                <img src='https://img.icons8.com/fluency/20/combo-chart.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Track Progress</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-4'>
+                <div class='card h-100 border-0 shadow-sm border-top border-4 border-success'>
+                    <div class='card-body text-center p-4'>
+                        <img src='https://img.icons8.com/fluency/64/company.png' alt='Employer' class='mb-3'>
+                        <h4 class='card-title fw-bold'>Employer</h4>
+                        <ul class='list-unstyled text-start mt-4 ps-0'>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-success me-3'>1</span>
+                                <img src='https://img.icons8.com/fluency/20/add-job.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Post Job Openings</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-success me-3'>2</span>
+                                <img src='https://img.icons8.com/fluency/20/briefcase.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>AI Resume Matching</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-success me-3'>3</span>
+                                <img src='https://img.icons8.com/fluency/20/filtered.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Filter Candidates</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-success me-3'>4</span>
+                                <img src='https://img.icons8.com/fluency/20/folder-invoices.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Manage Applications</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge bg-success me-3'>5</span>
+                                <img src='https://img.icons8.com/fluency/20/combo-chart.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Analytics Dashboard</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-4'>
+                <div class='card h-100 border-0 shadow-sm border-top border-4 border-purple' style='border-top-color: #9c27b0 !important;'>
+                    <div class='card-body text-center p-4'>
+                        <img src='https://img.icons8.com/fluency/64/admin-settings-male.png' alt='Admin' class='mb-3'>
+                        <h4 class='card-title fw-bold'>Admin</h4>
+                        <ul class='list-unstyled text-start mt-4 ps-0'>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge' style='background:#9c27b0;color:#fff;margin-right:12px;'>1</span>
+                                <img src='https://img.icons8.com/fluency/20/check-all.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Approve Employers</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge' style='background:#9c27b0;color:#fff;margin-right:12px;'>2</span>
+                                <img src='https://img.icons8.com/fluency/20/contacts.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Manage All Users</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge' style='background:#9c27b0;color:#fff;margin-right:12px;'>3</span>
+                                <img src='https://img.icons8.com/fluency/20/monitor.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Monitor Platform</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge' style='background:#9c27b0;color:#fff;margin-right:12px;'>4</span>
+                                <img src='https://img.icons8.com/fluency/20/business-center.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>View All Jobs</span>
+                            </li>
+                            <li class='mb-2 d-flex align-items-start'>
+                                <span class='badge' style='background:#9c27b0;color:#fff;margin-right:12px;'>5</span>
+                                <img src='https://img.icons8.com/fluency/20/settings--v1.png' class='me-2' style='width:20px;height:20px;margin-top:3px;'>
+                                <span>Full Control</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id='features' class='py-5 bg-light'>
+    <div class='container py-5'>
+        <div class='text-center mb-5'>
+            <h2 class='fw-bold'>Core Features</h2>
+            <p class='text-muted'>Advanced technology to empower your career</p>
+        </div>
+        <div class='row g-4'>
+            <div class='col-md-4'>
+                <div class='card border-0 shadow-sm p-4 h-100'>
+                    <img src='https://img.icons8.com/fluency/64/resume.png' alt='Resume' class='mb-3' style='width: 64px;'>
+                    <h4>Smart Resume Analysis</h4>
+                    <p class='text-muted'>Our AI analyzes your resume, extracts key skills, calculates a compatibility score, and provides actionable tips for improvement.</p>
+                </div>
+            </div>
+            <div class='col-md-4'>
+                <div class='card border-0 shadow-sm p-4 h-100'>
+                    <img src='https://img.icons8.com/fluency/64/briefcase.png' alt='Job Match' class='mb-3' style='width: 64px;'>
+                    <h4>Job Matching</h4>
+                    <p class='text-muted'>AI-powered matching checks your eligibility for specific roles, providing match percentages and recommended job opportunities.</p>
+                </div>
+            </div>
+            <div class='col-md-4'>
+                <div class='card border-0 shadow-sm p-4 h-100'>
+                    <img src='https://img.icons8.com/fluency/64/questions.png' alt='Interview' class='mb-3' style='width: 64px;'>
+                    <h4>Interview System</h4>
+                    <p class='text-muted'>Take role-specific automated interviews with real-time scoring and detailed performance analytics to prepare you for the real deal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<!-- <section class='py-5 text-white' style='background: linear-gradient(135deg, #121212 0%, #333333 100%);'>
+    <div class='container py-5'>
+        <div class='row text-center g-4'>
+            <div class='col-md-3'><h2 class='fw-bold'>10000+</h2><p>Candidates</p></div>
+            <div class='col-md-3'><h2 class='fw-bold'>500+</h2><p>Companies</p></div>
+            <div class='col-md-3'><h2 class='fw-bold'>5000+</h2><p>Jobs</p></div>
+            <div class='col-md-3'><h2 class='fw-bold'>85%</h2><p>Success Rate</p></div>
+        </div>
+    </div>
+</section> -->
+
+<!-- CTA Section -->
+<section class='py-5 text-center'>
+    <div class='container py-5'>
+        <h2 class='display-6 fw-bold mb-4'>Ready to Start Your Career Journey?</h2>
+        <div class='d-flex justify-content-center gap-3'>
+            <a href="{{ url_for('auth.register') }}" class='btn btn-primary btn-lg'>Join as Candidate</a>
+            <a href="{{ url_for('auth.register_employer') }}" class='btn btn-success btn-lg'>Register Company</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

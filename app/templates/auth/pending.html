@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending Approval - Smart Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg text-center p-5 rounded-4">
+                <div class="mb-4">
+                    <img src="https://img.icons8.com/fluency/96/time-span.png" alt="Pending">
+                </div>
+                <h2 class="fw-bold mb-3">Account Pending Approval</h2>
+                <p class="text-muted lead mb-4">
+                    Thank you for registering <strong>{{ company_name }}</strong>. Our administrators are currently reviewing your application.
+                </p>
+                <div class="alert alert-warning mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> You will be notified via email once your account is activated.
+                </div>
+                <div class="d-grid gap-2 col-md-8 mx-auto">
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

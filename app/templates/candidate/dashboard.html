@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Welcome back, {{ current_user.name.split()[0] }}! 👋</h1>
+                <p class="page-subtitle">Here's your job search overview</p>
+            </div>
+            <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-primary">
+                <img src="https://img.icons8.com/fluency/20/resume.png" alt="" style="filter:brightness(10);width:18px;height:18px"> Upload Resume
+            </a>
+        </div>
+
+        <div class="stat-cards">
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon primary"><img src="https://img.icons8.com/fluency/28/resume.png" alt=""></div>
+                <div>
+                    <div class="stat-widget-number">{{ 1 if resume else 0 }}</div>
+                    <div class="stat-widget-label">Resumes Uploaded</div>
+                </div>
+            </div>
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon success"><img src="https://img.icons8.com/fluency/28/star.png" alt=""></div>
+                <div>
+                    <div class="stat-widget-number">{{ resume.resume_score if resume else 0 }}%</div>
+                    <div class="stat-widget-label">Latest Resume Score</div>
+                </div>
+            </div>
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon warning"><img src="https://img.icons8.com/fluency/28/briefcase.png" alt=""></div>
+                <div>
+                    <div class="stat-widget-number">{{ applications|length if applications else 0 }}</div>
+                    <div class="stat-widget-label">Jobs Applied</div>
+                </div>
+            </div>
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon purple"><img src="https://img.icons8.com/fluency/28/questions.png" alt=""></div>
+                <div>
+                    <div class="stat-widget-number">{{ recent_interviews|length if recent_interviews else 0 }}</div>
+                    <div class="stat-widget-label">Interviews Taken</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title"><img src="https://img.icons8.com/fluency/20/briefcase.png" alt="" style="width:20px;height:20px;margin-right:8px">Recommended Jobs</h5>
+                        <a href="{{ url_for('candidate.jobs') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if suggested_jobs %}
+                            {% for job in suggested_jobs[:5] %}
+                            <div class="d-flex align-items-center gap-3 p-3 border-bottom" style="border-color:#e2e8f0!important">
+                                {% if job.company_logo %}
+                                    <img src="{{ url_for('static', filename='uploads/' + job.company_logo) }}" class="company-logo" alt="">
+                                {% else %}
+                                    <div class="company-logo-placeholder">{{ job.company_name[0] }}</div>
+                                {% endif %}
+                                <div class="flex-grow-1 min-width-0">
+                                    <div class="fw-700" style="font-size:.9rem">{{ job.title }}</div>
+                                    <div style="font-size:.8125rem;color:#64748b">{{ job.company_name }} &bull; {{ job.location }}</div>
+                                    <div class="d-flex gap-2 mt-1 flex-wrap">
+                                        <span class="chip">{{ job.job_type }}</span>
+                                        <span class="chip">{{ job.field }}</span>
+                                    </div>
+                                </div>
+                                {% if job.applied %}
+                                    <button class="btn btn-outline-primary btn-sm flex-shrink-0" disabled>Applied</button>
+                                {% else %}
+                                    <a href="{{ url_for('candidate.jobs') }}" class="btn btn-outline-primary btn-sm flex-shrink-0">Apply</a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state py-4">
+                                <img src="https://img.icons8.com/fluency/64/briefcase.png" alt="">
+                                <p>Upload your resume to get personalized job recommendations</p>
+                                <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-primary btn-sm">Upload Resume</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title"><img src="https://img.icons8.com/fluency/20/time-machine.png" alt="" style="width:20px;height:20px;margin-right:8px">Recent Applications</h5>
+                        <a href="{{ url_for('candidate.jobs') }}" class="btn btn-outline-primary btn-sm">Browse Jobs</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if applications %}
+                            <div class="table-responsive">
+                            <table class="table">
+                                <thead><tr><th>Job</th><th>Company</th><th>Status</th><th>Applied</th></tr></thead>
+                                <tbody>
+                                {% for app in applications[:5] %}
+                                <tr>
+                                    <td class="fw-600">{{ app.job_title }}</td>
+                                    <td style="font-size:.8125rem;color:#64748b">{{ app.company_name }}</td>
+                                    <td><span class="badge-status {{ app.status }}">{{ app.status.replace('_', ' ').title() }}</span></td>
+                                    <td style="font-size:.8125rem;color:#94a3b8">{{ app.applied_at.strftime('%b %d') if app.applied_at else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                        {% else %}
+                            <div class="empty-state py-4">
+                                <img src="https://img.icons8.com/fluency/64/briefcase.png" alt="">
+                                <p>You haven't applied to any jobs yet</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title"><img src="https://img.icons8.com/fluency/20/resume.png" alt="" style="width:20px;height:20px;margin-right:8px">Resume Score</h5>
+                        <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-outline-primary btn-sm">Upload</a>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if resume %}
+                            <div style="margin:1rem 0">
+                                <div style="position:relative;display:inline-block">
+                                    <svg width="140" height="140" viewBox="0 0 140 140">
+                                        <circle cx="70" cy="70" r="58" fill="none" stroke="#e2e8f0" stroke-width="12"/>
+                                        <circle cx="70" cy="70" r="58" fill="none" 
+                                            stroke="{% if resume and resume.resume_score >= 70 %}#059669{% elif resume and resume.resume_score >= 50 %}#d97706{% else %}#dc2626{% endif %}"
+                                            stroke-width="12" stroke-linecap="round"
+                                            stroke-dasharray="{{ (resume.resume_score / 100) * 364.4 }} 364.4"
+                                            transform="rotate(-90 70 70)"/>
+                                    </svg>
+                                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                                        <span style="font-size:2rem;font-weight:800;line-height:1">{{ resume.resume_score if resume else 0 }}</span>
+                                        <span style="font-size:.75rem;color:#64748b;font-weight:600">/ 100</span>
+                                    </div>
+                                </div>
+                                <p style="font-size:.875rem;color:#64748b;margin-top:.5rem">
+                                    {% if resume and resume.resume_score >= 70 %}Excellent Score! You're eligible for most jobs.
+                                    {% elif resume and resume.resume_score >= 50 %}Good score. Consider improving your resume.
+                                    {% else %}Low score. Update your resume with more skills and experience.{% endif %}
+                                </p>
+                            </div>
+                        {% else %}
+                            <div class="empty-state py-3">
+                                <img src="https://img.icons8.com/fluency/64/resume.png" alt="">
+                                <h4>No Resume Yet</h4>
+                                <p>Upload your resume to get an AI-powered score</p>
+                                <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-primary btn-sm">Upload Resume</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title"><img src="https://img.icons8.com/fluency/20/questions.png" alt="" style="width:20px;height:20px;margin-right:8px">Recent Interviews</h5>
+                        <a href="{{ url_for('candidate.interview_history') }}" class="btn btn-outline-primary btn-sm">History</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_interviews %}
+                            {% for iv in recent_interviews[:3] %}
+                            <div class="d-flex align-items-center justify-content-between gap-2 p-3 border-bottom" style="border-color:#e2e8f0!important">
+                                <div>
+                                    <div style="font-size:.875rem;font-weight:600">{{ iv.interview_type }}</div>
+                                    <div style="font-size:.75rem;color:#94a3b8">{{ iv.completed_at.strftime('%b %d, %Y') if iv.completed_at else '' }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div style="font-size:1.125rem;font-weight:800;color:{% if iv.score >= 70 %}#059669{% elif iv.score >= 50 %}#d97706{% else %}#dc2626{% endif %}">{{ iv.score }}%</div>
+                                    <a href="{{ url_for('candidate.interview_results', interview_id=iv.id) }}" class="btn btn-outline-primary btn-sm" style="font-size:.7rem;padding:.2rem .5rem">View</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state py-3">
+                                <img src="https://img.icons8.com/fluency/48/questions.png" alt="">
+                                <p>No interviews taken yet</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

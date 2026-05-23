@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Interview Session - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="interview-header">
+            <div>
+                <h4 style="color:#fff;margin:0;font-weight:700">{{ interview.interview_type }} Interview</h4>
+                <p style="color:rgba(255,255,255,.7);margin:0;font-size:.875rem">{{ interview.difficulty|title }} &bull; {{ questions|length }} Questions</p>
+            </div>
+            <div class="text-center">
+                <div class="interview-timer" id="timer">30:00</div>
+                <div style="font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px">Time Remaining</div>
+            </div>
+            <div>
+                <div style="color:rgba(255,255,255,.7);font-size:.875rem;text-align:right">Question Progress</div>
+                <div style="font-size:1.25rem;font-weight:700;color:#fff;text-align:right"><span id="answeredCount">0</span>/{{ questions|length }}</div>
+            </div>
+        </div>
+
+        <form method="POST" id="interviewForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% for q in questions %}
+            <div class="question-card" id="q{{ loop.index }}">
+                <span class="question-number">Question {{ loop.index }} of {{ questions|length }}</span>
+                <p class="question-text">{{ q.question_text }}</p>
+                <div>
+                    {% set qid = q.id if q.id else loop.index0|string %}
+                    {% for opt in q.options %}
+                    <label class="option-label" onclick="selectOption(this, 'q{{ qid }}')">
+                        <input type="radio" name="answer_{{ qid }}" value="{{ opt }}">
+                        <span class="option-radio"></span>
+                        <span>{{ opt }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                    <img src="https://img.icons8.com/fluency/20/send.png" alt="" style="filter:brightness(10);width:18px;height:18px"> Submit Interview
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+let timeLeft = {{ interview.time_limit * 60 if interview.time_limit else 1800 }};
+const timerEl = document.getElementById('timer');
+let answered = {};
+
+function pad(n){ return n < 10 ? '0'+n : n; }
+
+const timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    timerEl.textContent = pad(m) + ':' + pad(s);
+    if(timeLeft <= 300) timerEl.classList.add('warning');
+    if(timeLeft <= 60) { timerEl.classList.remove('warning'); timerEl.classList.add('danger'); }
+    if(timeLeft <= 0) { clearInterval(timerInterval); document.getElementById('interviewForm').submit(); }
+}, 1000);
+
+function selectOption(label, qid){
+    label.closest('.question-card').querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+    label.classList.add('selected');
+    if(!answered[qid]){ answered[qid] = true; document.getElementById('answeredCount').textContent = Object.keys(answered).length; }
+}
+
+document.getElementById('submitBtn').addEventListener('click', function(e){
+    const total = {{ questions|length }};
+    const answeredCount = Object.keys(answered).length;
+    if(answeredCount < total){
+        if(!confirm('You have answered ' + answeredCount + '/' + total + ' questions. Submit anyway?')) e.preventDefault();
+    }
+});
+</script>
+{% endblock %}

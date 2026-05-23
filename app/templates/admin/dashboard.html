@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Admin Dashboard</h1>
+                <p class="page-subtitle">Platform overview and management</p>
+            </div>
+        </div>
+        <div class="stat-cards">
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon primary"><img src="https://img.icons8.com/fluency/28/conference-call.png" alt=""></div>
+                <div><div class="stat-widget-number">{{ total_candidates }}</div><div class="stat-widget-label">Total Candidates</div></div>
+            </div>
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon success"><img src="https://img.icons8.com/fluency/28/company.png" alt=""></div>
+                <div><div class="stat-widget-number">{{ total_employers }}</div><div class="stat-widget-label">Total Employers</div></div>
+            </div>
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon warning"><img src="https://img.icons8.com/fluency/28/time-span.png" alt=""></div>
+                <div><div class="stat-widget-number">{{ pending_employers }}</div><div class="stat-widget-label">Pending Approval</div></div>
+            </div>
+            <div class="stat-card-widget">
+                <div class="stat-widget-icon purple"><img src="https://img.icons8.com/fluency/28/briefcase.png" alt=""></div>
+                <div><div class="stat-widget-number">{{ total_jobs }}</div><div class="stat-widget-label">Active Jobs</div></div>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title" style="display:flex;align-items:center;gap:.5rem">
+                            <img src="https://img.icons8.com/fluency/20/time-span.png" alt="" style="width:20px;height:20px">
+                            Pending Employers
+                        </h5>
+                        <a href="{{ url_for('admin.employers') }}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_employers %}
+                        {% for emp in recent_employers %}
+                        <div class="d-flex align-items-center gap-3 p-3 border-bottom" style="border-color:#e2e8f0!important">
+                            <div class="avatar avatar-sm">{{ emp.get_initials() }}</div>
+                            <div class="flex-grow-1">
+                                <div style="font-weight:600;font-size:.875rem">{{ emp.company_name or emp.name }}</div>
+                                <div style="font-size:.75rem;color:#94a3b8">{{ emp.email }}</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <form method="POST" action="{{ url_for('admin.approve_employer', employer_id=emp.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.reject_employer', employer_id=emp.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state py-3">
+                            <img src="https://img.icons8.com/fluency/48/checkmark--v1.png" alt="">
+                            <p>No pending approvals</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header"><h5 class="card-title">Platform Activity</h5></div>
+                    <div class="card-body"><canvas id="activityChart" height="250"></canvas></div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Recent Jobs</h5>
+                        <a href="{{ url_for('admin.jobs') }}" class="btn btn-outline-primary btn-sm">Manage All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_jobs %}
+                        <div class="table-responsive">
+                        <table class="table">
+                            <thead><tr><th>Job Title</th><th>Employer</th><th>Field</th><th>Applicants</th><th>Status</th><th>Posted</th></tr></thead>
+                            <tbody>
+                            {% for job in recent_jobs %}
+                            <tr>
+                                <td style="font-weight:600">{{ job.title }}</td>
+                                <td style="font-size:.875rem">{{ job.company_name }}</td>
+                                <td><span class="chip">{{ job.field }}</span></td>
+                                <td style="font-weight:600;color:#1e40af">{{ job.applicant_count or 0 }}</td>
+                                <td><span class="badge-status {% if job.is_active %}approved{% else %}rejected{% endif %}">{{ 'Active' if job.is_active else 'Inactive' }}</span></td>
+                                <td style="font-size:.8125rem;color:#94a3b8">{{ job.created_at.strftime('%b %d') if job.created_at else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state py-3"><p>No jobs yet</p></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const actData = {{ act_data|tojson }};
+if(actData) {
+    new Chart(document.getElementById('activityChart'), {
+        type: 'bar',
+        data: { labels: actData.labels, datasets: [
+            { label: 'Candidates', data: actData.candidates, backgroundColor: '#3b82f6' },
+            { label: 'Employers', data: actData.employers, backgroundColor: '#059669' },
+            { label: 'Jobs', data: actData.jobs, backgroundColor: '#7c3aed' }
+        ]},
+        options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'top' } } }
+    });
+}
+</script>
+{% endblock %}

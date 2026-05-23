@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}My Jobs - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">My Job Postings</h1>
+                <p class="page-subtitle">Manage your active and inactive job listings</p>
+            </div>
+            <a href="{{ url_for('employer.post_job') }}" class="btn btn-primary">
+                <img src="https://img.icons8.com/fluency/20/plus-math.png" alt="" style="filter:brightness(10);width:16px;height:16px"> Post New Job
+            </a>
+        </div>
+        {% if jobs %}
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Job Title</th><th>Field</th><th>Location</th><th>Min Score</th><th>Applicants</th><th>Status</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>
+                        <div style="font-weight:700">{{ job.title }}</div>
+                        <div style="font-size:.75rem;color:#64748b">{{ job.job_type }}</div>
+                    </td>
+                    <td><span class="chip">{{ job.field }}</span></td>
+                    <td style="font-size:.875rem">{{ job.location }}</td>
+                    <td>
+                        <span style="font-weight:700;color:#1e40af">{{ job.min_resume_score }}%</span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('employer.applicants') }}?job_id={{ job.id }}" style="font-weight:700;color:#1e40af">{{ job.applicant_count or 0 }}</a>
+                    </td>
+                    <td><span class="badge-status {% if job.is_active %}approved{% else %}rejected{% endif %}">{{ 'Active' if job.is_active else 'Inactive' }}</span></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form method="POST" action="{{ url_for('employer.toggle_job', job_id=job.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm {% if job.is_active %}btn-warning{% else %}btn-success{% endif %}">{{ 'Deactivate' if job.is_active else 'Activate' }}</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('employer.delete_job', job_id=job.id) }}" onsubmit="return confirm('Delete this job?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:6rem 2rem">
+            <img src="https://img.icons8.com/fluency/96/briefcase.png" alt="">
+            <h4>No Jobs Posted Yet</h4>
+            <p>Create your first job posting to start attracting candidates</p>
+            <a href="{{ url_for('employer.post_job') }}" class="btn btn-primary">Post First Job</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

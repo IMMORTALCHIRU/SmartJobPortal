@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Candidate{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+                <div class="row g-0">
+                    <div class="col-md-5 d-none d-md-flex align-items-center text-white p-5" 
+                         style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                        <div>
+                            <h2 class="fw-bold mb-4">Join as Candidate</h2>
+                            <p class="lead mb-5">Unlock your career potential with our AI-powered features.</p>
+                            <ul class="list-unstyled">
+                                <li class="mb-3 d-flex align-items-center"><img src="https://img.icons8.com/fluency/24/checkmark.png" class="me-2"> Free AI Resume Analysis</li>
+                                <li class="mb-3 d-flex align-items-center"><img src="https://img.icons8.com/fluency/24/checkmark.png" class="me-2"> Targeted Job Matches</li>
+                                <li class="mb-3 d-flex align-items-center"><img src="https://img.icons8.com/fluency/24/checkmark.png" class="me-2"> Mock Interview Sessions</li>
+                                <li class="mb-3 d-flex align-items-center"><img src="https://img.icons8.com/fluency/24/checkmark.png" class="me-2"> Career Path Tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-7 p-5 bg-white">
+                        <h3 class="fw-bold mb-4">Create Candidate Account</h3>
+                        <form method="POST" action="{{ url_for('auth.register') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+91 999 999 9999" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Location</label>
+                                    <input type="text" name="location" class="form-control" placeholder="e.g. Bangalore" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="register_password" class="form-control" placeholder="Create password" required>
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle-password="#register_password" aria-label="Toggle password">
+                                            <img src="https://img.icons8.com/?size=100&id=85130&format=png&color=000000" alt="Toggle" style="width:18px;height:18px">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="confirm_password" id="register_confirm_password" class="form-control" placeholder="Repeat password" required>
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle-password="#register_confirm_password" aria-label="Toggle password">
+                                            <img src="https://img.icons8.com/?size=100&id=85130&format=png&color=000000" alt="Toggle" style="width:18px;height:18px">
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Password requirements: at least 8 characters and at least 1 uppercase letter.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-3 mb-4">Register as Candidate</button>
+                            <p class="text-center mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold">Sign In</a></p>
+                            <hr class="my-4">
+                            <p class="text-center small">Hiring for a company? <a href="{{ url_for('auth.register_employer') }}" class="text-success fw-bold">Register as Employer</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

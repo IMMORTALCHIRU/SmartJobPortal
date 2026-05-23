@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">My Profile</h1>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card text-center">
+                    <div class="card-body py-4">
+                        <div class="avatar avatar-lg mx-auto mb-3" style="width:80px;height:80px;font-size:1.5rem">{{ current_user.get_initials() }}</div>
+                        <h4 style="font-weight:700">{{ current_user.name }}</h4>
+                        <p style="color:#64748b;font-size:.875rem;margin-bottom:.5rem">{{ current_user.email }}</p>
+                        <span class="role-badge candidate">Candidate</span>
+                        {% if current_user.location %}<p style="font-size:.8125rem;color:#94a3b8;margin-top:.75rem"><img src="https://img.icons8.com/fluency/14/map-pin.png" alt="" style="width:14px;height:14px"> {{ current_user.location }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header"><h5 class="card-title">Edit Profile</h5></div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" name="phone" class="form-control" value="{{ current_user.phone or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Location</label>
+                                    <input type="text" name="location" class="form-control" value="{{ current_user.location or '' }}" placeholder="City, Country">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Years of Experience</label>
+                                    <input type="number" name="experience_years" class="form-control" min="0" max="50" value="{{ current_user.experience_years or 0 }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Bio / Summary</label>
+                                    <textarea name="bio" class="form-control" rows="3" placeholder="Tell employers about yourself...">{{ current_user.bio or '' }}</textarea>
+                                </div>
+                                <div class="col-12 pt-2">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Browse Jobs - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Browse Jobs</h1>
+                <p class="page-subtitle">Find jobs matching your skills and experience</p>
+            </div>
+        </div>
+
+        {% if resume %}
+        <div class="resume-score-card mb-4">
+            <div class="resume-score-circle">
+                <span class="score-num">{{ resume.resume_score }}</span>
+                <span class="score-lbl">Score</span>
+            </div>
+            <div>
+                <div style="font-size:1.125rem;font-weight:700;color:#fff;margin-bottom:.25rem">Your Resume Score</div>
+                <p style="color:rgba(255,255,255,.75);font-size:.875rem;margin:0">Jobs requiring score ≤ {{ resume.resume_score }} are eligible for you</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="card mb-4 border-warning">
+            <div class="card-body d-flex align-items-center gap-3">
+                <img src="https://img.icons8.com/fluency/32/warning.png" alt="" style="width:32px;height:32px">
+                <div class="flex-grow-1">
+                    <strong>Upload your resume first</strong> to check job eligibility and apply for jobs.
+                </div>
+                <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-warning btn-sm">Upload Now</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body py-3">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="q" class="form-control" placeholder="Title, skill, company..." value="{{ request.args.get('q','') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Field</label>
+                        <select name="field" class="form-select">
+                            <option value="">All Fields</option>
+                            {% for f in ['Technology','Finance','Healthcare','Marketing','Design','Operations'] %}
+                            <option value="{{ f }}" {% if request.args.get('field')==f %}selected{% endif %}>{{ f }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Job Type</label>
+                        <select name="type" class="form-select">
+                            <option value="">All Types</option>
+                            {% for t in ['Full-time','Part-time','Contract','Internship','Remote'] %}
+                            <option value="{{ t }}" {% if request.args.get('type')==t %}selected{% endif %}>{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <img src="https://img.icons8.com/fluency/20/search.png" alt="" style="filter:brightness(10);width:16px;height:16px"> Search
+                        </button>
+                        <a href="{{ url_for('candidate.jobs') }}" class="btn btn-outline-primary">Clear</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if jobs %}
+        <div class="row g-4">
+            {% for item in jobs %}
+{% set job = item.job %}
+{% set is_eligible = item.eligible %}
+{% set is_applied = item.applied %}
+            <div class="col-lg-6">
+                <div class="job-card">
+                    <div class="job-card-header">
+                        {% if job.company_logo %}
+                            <img src="{{ url_for('static', filename='uploads/' + job.company_logo) }}" class="company-logo" alt="">
+                        {% else %}
+                            <div class="company-logo-placeholder">{{ job.company_name[0] if job.company_name else 'C' }}</div>
+                        {% endif %}
+                        <div class="flex-grow-1 min-width-0">
+                            <h5 class="job-title">{{ job.title }}</h5>
+                            <div class="job-company">{{ job.company_name }}</div>
+                        </div>
+                        {% if is_applied %}
+                            <span class="eligible-badge applied"><img src="https://img.icons8.com/fluency/14/checkmark--v1.png" alt=""> Applied</span>
+                        {% elif is_eligible %}
+                            <span class="eligible-badge yes"><img src="https://img.icons8.com/fluency/14/checkmark--v1.png" alt=""> Eligible</span>
+                        {% else %}
+                            <span class="eligible-badge no"><img src="https://img.icons8.com/fluency/14/multiply.png" alt=""> Not Eligible</span>
+                        {% endif %}
+                    </div>
+                    <div class="job-meta">
+                        <span class="job-tag"><img src="https://img.icons8.com/fluency/14/map-pin.png" alt="">{{ job.location }}</span>
+                        <span class="job-tag"><img src="https://img.icons8.com/fluency/14/work.png" alt="">{{ job.job_type }}</span>
+                        {% if job.experience_required %}<span class="job-tag"><img src="https://img.icons8.com/fluency/14/time-span.png" alt="">{{ job.experience_required }}+ yrs</span>{% endif %}
+                        {% if job.salary_range %}<span class="job-tag"><img src="https://img.icons8.com/fluency/14/money-bag.png" alt="">{{ job.salary_range }}</span>{% endif %}
+                    </div>
+                    {% if job.required_skills %}
+                    <div class="job-skills">
+                        {% for skill in job.required_skills[:5] %}<span class="skill-tag">{{ skill }}</span>{% endfor %}
+                        {% if job.required_skills|length > 5 %}<span class="chip">+{{ job.required_skills|length - 5 }} more</span>{% endif %}
+                    </div>
+                    {% endif %}
+                    {% if resume %}
+                    <div class="eligibility-bar">
+                        <div class="eligibility-label">
+                            <span>Resume Score</span>
+                            <span>{{ resume.resume_score }}/{{ job.min_resume_score }} required</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar {% if is_eligible %}bg-success{% else %}bg-danger{% endif %}" style="width:{{ [resume.resume_score, 100]|min }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="job-card-actions d-flex gap-2">
+                        {% if is_applied %}
+                            <button class="btn btn-sm btn-outline-primary w-100" disabled>Already Applied</button>
+                        {% elif is_eligible and resume %}
+                            <form method="POST" action="{{ url_for('candidate.apply_job', job_id=job.id) }}" class="w-100">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <img src="https://img.icons8.com/fluency/18/send.png" alt="" style="filter:brightness(10);width:16px;height:16px"> Apply Now
+                                </button>
+                            </form>
+                        {% elif not resume %}
+                            <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-outline-primary btn-sm w-100">Upload Resume to Apply</a>
+                        {% else %}
+                            <button class="btn btn-sm w-100" disabled style="background:#f1f5f9;color:#94a3b8;cursor:not-allowed">
+                                Score Too Low (need {{ job.min_resume_score }})
+                            </button>
+                        {% endif %}
+                        {% if is_applied %}
+                        <a href="{{ url_for('candidate.start_interview', job_id=job.id) }}" class="btn btn-outline-primary btn-sm flex-shrink-0">
+                            <img src="https://img.icons8.com/fluency/18/questions.png" alt="" style="width:16px;height:16px"> Interview
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="empty-state" style="padding:5rem 2rem">
+                <img src="https://img.icons8.com/fluency/96/briefcase.png" alt="">
+                <h4>No Jobs Found</h4>
+                <p>Try adjusting your search filters or check back later for new postings.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

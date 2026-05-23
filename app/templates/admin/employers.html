@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Manage Employers - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Manage Employers</h1>
+                <p class="page-subtitle">Approve, reject, and manage employer accounts</p>
+            </div>
+        </div>
+        {% if pending %}
+        <div class="card mb-4" style="border-left:4px solid #d97706">
+            <div class="card-header"><h5 class="card-title" style="color:#d97706">Pending Approval ({{ pending|length }})</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Industry</th><th>Registered</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for emp in pending %}
+                    <tr>
+                        <td style="font-weight:600">{{ emp.name }}</td>
+                        <td>{{ emp.company_name or '-' }}</td>
+                        <td style="font-size:.875rem">{{ emp.email }}</td>
+                        <td><span class="chip">{{ emp.industry or '-' }}</span></td>
+                        <td style="font-size:.8125rem;color:#94a3b8">{{ emp.created_at.strftime('%b %d, %Y') if emp.created_at else '-' }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form method="POST" action="{{ url_for('admin.approve_employer', employer_id=emp.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-success btn-sm">Approve</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.reject_employer', employer_id=emp.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">All Employers</h5></div>
+            <div class="card-body p-0">
+                {% if employers %}
+                <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for emp in employers %}
+                    <tr>
+                        <td style="font-weight:600">{{ emp.name }}</td>
+                        <td>{{ emp.company_name or '-' }}</td>
+                        <td style="font-size:.875rem">{{ emp.email }}</td>
+                        <td><span class="badge-status {% if emp.is_approved %}approved{% else %}pending{% endif %}">{{ 'Approved' if emp.is_approved else 'Pending' }}</span></td>
+                        <td><span class="badge-status {% if emp.is_active %}approved{% else %}rejected{% endif %}">{{ 'Active' if emp.is_active else 'Suspended' }}</span></td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form method="POST" action="{{ url_for('admin.toggle_user', user_id=emp.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-sm {% if emp.is_active %}btn-warning{% else %}btn-success{% endif %}">{{ 'Suspend' if emp.is_active else 'Activate' }}</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=emp.id) }}" onsubmit="return confirm('Delete this employer?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty-state py-4"><p>No employers registered yet</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

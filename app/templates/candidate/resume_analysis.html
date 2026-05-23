@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Resume Analysis - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <nav aria-label="breadcrumb" class="breadcrumb mb-0">
+                    <a href="{{ url_for('candidate.resume_history') }}" style="color:#1e40af;font-size:.875rem">Resume History</a>
+                    <span style="color:#94a3b8;margin:0 .5rem">/</span>
+                    <span style="font-size:.875rem;color:#64748b">Analysis</span>
+                </nav>
+                <h1 class="page-title mt-1">Resume Analysis</h1>
+            </div>
+            <a href="{{ url_for('candidate.resume_upload') }}" class="btn btn-primary btn-sm">Upload New</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center py-4">
+                        <div style="position:relative;display:inline-block;margin-bottom:1rem">
+                            <svg width="160" height="160" viewBox="0 0 160 160">
+                                <circle cx="80" cy="80" r="68" fill="none" stroke="#e2e8f0" stroke-width="14"/>
+                                <circle cx="80" cy="80" r="68" fill="none"
+                                    stroke="{% if resume.resume_score >= 70 %}#059669{% elif resume.resume_score >= 50 %}#d97706{% else %}#dc2626{% endif %}"
+                                    stroke-width="14" stroke-linecap="round"
+                                    stroke-dasharray="{{ (resume.resume_score / 100) * 427.3 }} 427.3"
+                                    transform="rotate(-90 80 80)"/>
+                            </svg>
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                                <span style="font-size:2.5rem;font-weight:800;line-height:1">{{ resume.resume_score }}</span>
+                                <span style="font-size:.875rem;color:#64748b">/100</span>
+                            </div>
+                        </div>
+                        <h4 style="font-weight:700;margin-bottom:.5rem">
+                            {% if resume.resume_score >= 70 %}Excellent Resume!
+                            {% elif resume.resume_score >= 50 %}Good Resume
+                            {% else %}Needs Improvement{% endif %}
+                        </h4>
+                        <p style="font-size:.875rem;color:#64748b">{{ resume.filename }}</p>
+                        <p style="font-size:.8125rem;color:#94a3b8">Uploaded {{ resume.uploaded_at.strftime('%B %d, %Y') if resume.uploaded_at else '' }}</p>
+                    </div>
+                </div>
+
+                <div class="analysis-section">
+                    <h5><img src="https://img.icons8.com/fluency/20/star.png" alt="">Score Breakdown</h5>
+                    {% set breakdown = resume.score_breakdown or {} %}
+                    {% for key, val in [('Skills','skills'),('Experience','experience'),('Education','education'),('Keywords','keywords')] %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:.8125rem;font-weight:600">
+                            <span>{{ key }}</span><span>{{ breakdown.get(val, 0) }}%</span>
+                        </div>
+                        <div class="progress"><div class="progress-bar bg-success" style="width:{{ breakdown.get(val, 0) }}%"></div></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                {% if resume.skills %}
+                <div class="analysis-section">
+                    <h5><img src="https://img.icons8.com/fluency/20/gear.png" alt="">Detected Skills</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for skill in resume.skills %}<span class="skill-tag">{{ skill }}</span>{% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resume.experience %}
+                <div class="analysis-section">
+                    <h5><img src="https://img.icons8.com/fluency/20/work.png" alt="">Experience</h5>
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="background:var(--candidate-light);border-radius:.875rem;padding:1rem 1.5rem;text-align:center">
+                            <div style="font-size:1.75rem;font-weight:800;color:var(--primary)">{{ resume.experience }}</div>
+                            <div style="font-size:.75rem;color:#64748b">Years</div>
+                        </div>
+                        <p style="font-size:.875rem;color:#475569;margin:0">{{ resume.experience_details if resume.experience_details else 'Experience details extracted from your resume' }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resume.education %}
+                <div class="analysis-section">
+                    <h5><img src="https://img.icons8.com/fluency/20/graduation-cap.png" alt="">Education</h5>
+                    <div class="d-flex flex-column gap-2">
+                        {% if resume.education is string %}
+                            <span class="chip">{{ resume.education }}</span>
+                        {% else %}
+                            {% for edu in resume.education %}<span class="chip">{{ edu }}</span>{% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if resume.suggestions %}
+                <div class="analysis-section" style="border-left:3px solid #1e40af">
+                    <h5><img src="https://img.icons8.com/fluency/20/idea.png" alt="">Improvement Suggestions</h5>
+                    <ul style="padding-left:1.25rem">
+                        {% for s in resume.suggestions %}<li style="font-size:.875rem;color:#475569;margin-bottom:.5rem">{{ s }}</li>{% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-3 mt-3">
+                    <a href="{{ url_for('candidate.jobs') }}" class="btn btn-primary">
+                        <img src="https://img.icons8.com/fluency/18/briefcase.png" alt="" style="filter:brightness(10);width:16px;height:16px"> Browse Matching Jobs
+                    </a>
+                    <a href="{{ url_for('candidate.resume_history') }}" class="btn btn-outline-primary">All Resumes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

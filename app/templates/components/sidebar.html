@@ -1,0 +1,81 @@
+{% set role = current_user.role if current_user.is_authenticated else '' %}
+<aside class="sidebar" id="sidebar">
+
+    {% if role == 'candidate' %}
+    <div class="sidebar-section-title">Main</div>
+    <a href="{{ url_for('candidate.dashboard') }}" class="sidebar-nav-item {% if request.endpoint == 'candidate.dashboard' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/dashboard-layout.png" alt=""> Dashboard
+    </a>
+    <div class="sidebar-section-title">Resume</div>
+    <a href="{{ url_for('candidate.resume_upload') }}" class="sidebar-nav-item {% if 'resume' in request.endpoint %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/resume.png" alt=""> Upload Resume
+    </a>
+    <a href="{{ url_for('candidate.resume_history') }}" class="sidebar-nav-item">
+        <img src="https://img.icons8.com/fluency/24/time-machine.png" alt=""> Resume History
+    </a>
+    <div class="sidebar-section-title">Jobs</div>
+    <a href="{{ url_for('candidate.jobs') }}" class="sidebar-nav-item {% if request.endpoint == 'candidate.jobs' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/briefcase.png" alt=""> Browse Jobs
+    </a>
+    <div class="sidebar-section-title">Interviews</div>
+    <a href="{{ url_for('candidate.interview_history') }}" class="sidebar-nav-item {% if 'interview' in request.endpoint %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/questions.png" alt=""> My Interviews
+    </a>
+    <div class="sidebar-section-title">Insights</div>
+    <a href="{{ url_for('candidate.analytics') }}" class="sidebar-nav-item {% if request.endpoint == 'candidate.analytics' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/combo-chart.png" alt=""> Analytics
+    </a>
+    <a href="{{ url_for('candidate.profile') }}" class="sidebar-nav-item {% if request.endpoint == 'candidate.profile' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/user.png" alt=""> My Profile
+    </a>
+
+    {% elif role == 'employer' %}
+    <div class="sidebar-section-title">Main</div>
+    <a href="{{ url_for('employer.dashboard') }}" class="sidebar-nav-item {% if request.endpoint == 'employer.dashboard' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/dashboard-layout.png" alt=""> Dashboard
+    </a>
+    <div class="sidebar-section-title">Jobs</div>
+    <a href="{{ url_for('employer.post_job') }}" class="sidebar-nav-item {% if request.endpoint == 'employer.post_job' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/plus-math.png" alt=""> Post a Job
+    </a>
+    <a href="{{ url_for('employer.my_jobs') }}" class="sidebar-nav-item {% if request.endpoint == 'employer.my_jobs' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/briefcase.png" alt=""> My Jobs
+    </a>
+    <div class="sidebar-section-title">Candidates</div>
+    <a href="{{ url_for('employer.applicants') }}" class="sidebar-nav-item {% if 'applicant' in request.endpoint %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/conference-call.png" alt=""> Applicants
+    </a>
+    <div class="sidebar-section-title">Settings</div>
+    <a href="{{ url_for('employer.profile') }}" class="sidebar-nav-item {% if request.endpoint == 'employer.profile' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/company.png" alt=""> Company Profile
+    </a>
+
+    {% elif role == 'admin' %}
+    <div class="sidebar-section-title">Overview</div>
+    <a href="{{ url_for('admin.dashboard') }}" class="sidebar-nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/dashboard-layout.png" alt=""> Dashboard
+    </a>
+    <div class="sidebar-section-title">Users</div>
+    <a href="{{ url_for('admin.employers') }}" class="sidebar-nav-item {% if request.endpoint == 'admin.employers' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/company.png" alt=""> Employers
+        {% if pending_count is defined and pending_count %}<span class="nav-badge">{{ pending_count }}</span>{% endif %}
+    </a>
+    <a href="{{ url_for('admin.candidates') }}" class="sidebar-nav-item {% if request.endpoint == 'admin.candidates' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/conference-call.png" alt=""> Candidates
+    </a>
+    <div class="sidebar-section-title">Content</div>
+    <a href="{{ url_for('admin.jobs') }}" class="sidebar-nav-item {% if request.endpoint == 'admin.jobs' %}active{% endif %}">
+        <img src="https://img.icons8.com/fluency/24/briefcase.png" alt=""> All Jobs
+    </a>
+    {% endif %}
+
+    <div style="margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.07);margin-top:2rem">
+        <a href="{{ url_for('auth.logout') }}" class="sidebar-nav-item" style="color:rgba(255,100,100,.7)">
+            <img src="https://img.icons8.com/fluency/24/exit.png" alt=""> Logout
+        </a>
+    </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<button class="sidebar-toggle" onclick="toggleSidebar()">
+    <img src="https://img.icons8.com/fluency/24/menu.png" alt="Menu" style="filter:brightness(10);width:22px;height:22px">
+</button>

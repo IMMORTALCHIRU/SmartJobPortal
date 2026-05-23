@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Candidate Detail - Smart Job Portal{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    {% include 'components/sidebar.html' %}
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <a href="{{ url_for('employer.applicants') }}" style="color:#1e40af;font-size:.875rem">Applicants</a>
+                    <span style="color:#94a3b8;margin:0 .5rem">/</span>
+                    <span style="font-size:.875rem;color:#64748b">{{ candidate.name }}</span>
+                </nav>
+                <h1 class="page-title mt-1">Candidate Profile</h1>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center py-4">
+                        <div class="avatar avatar-lg mx-auto mb-3" style="width:80px;height:80px;font-size:1.5rem">{{ candidate.get_initials() }}</div>
+                        <h4 style="font-weight:700">{{ candidate.name }}</h4>
+                        <p style="color:#64748b;font-size:.875rem">{{ candidate.email }}</p>
+                        {% if candidate.phone %}<p style="font-size:.875rem;color:#64748b">{{ candidate.phone }}</p>{% endif %}
+                        {% if candidate.location %}<p style="font-size:.8125rem;color:#94a3b8"><img src="https://img.icons8.com/fluency/14/map-pin.png" alt="" style="width:14px;height:14px"> {{ candidate.location }}</p>{% endif %}
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 style="font-weight:700;margin-bottom:1rem">Application Details</h5>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span style="font-size:.875rem;color:#64748b">Job</span>
+                            <span style="font-size:.875rem;font-weight:600">{{ job.title if job else "Unknown" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span style="font-size:.875rem;color:#64748b">Resume Score</span>
+                            <span style="font-size:.875rem;font-weight:700;color:{% if application.resume_score >= 70 %}#059669{% elif application.resume_score >= 50 %}#d97706{% else %}#dc2626{% endif %}">{{ application.resume_score }}%</span>
+                        </div>
+                        {% if application.interview_score is not none %}
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span style="font-size:.875rem;color:#64748b">Interview Score</span>
+                            <span style="font-size:.875rem;font-weight:700;color:{% if application.interview_score >= 70 %}#059669{% elif application.interview_score >= 50 %}#d97706{% else %}#dc2626{% endif %}">{{ application.interview_score }}%</span>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span style="font-size:.875rem;color:#64748b">Match</span>
+                            <span style="font-size:.875rem;font-weight:700;color:#1e40af">{{ job_match or 0 }}%</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span style="font-size:.875rem;color:#64748b">Status</span>
+                            <span class="badge-status {{ application.status }}">{{ application.status.replace('_',' ').title() }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 style="font-weight:700;margin-bottom:1rem">Update Status</h5>
+                        <form method="POST" action="{{ url_for('employer.update_status', app_id=application.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select name="status" class="form-select mb-3">
+                                {% for s in ['applied','interview_pending','interview_completed','shortlisted','rejected'] %}
+                                <option value="{{ s }}" {% if application.status == s %}selected{% endif %}>{{ s.replace('_',' ').title() }}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- Notes removed per UI requirement -->
+                            <button type="submit" class="btn btn-primary w-100">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                {% if resume %}
+                <div class="analysis-section mb-4">
+                    <h5><img src="https://img.icons8.com/fluency/20/resume.png" alt="">Resume Analysis</h5>
+                    {% if resume.skills %}
+                    <div class="mb-3">
+                        <div style="font-size:.875rem;font-weight:600;margin-bottom:.5rem">Skills</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in resume.skills %}<span class="skill-tag">{{ skill }}</span>{% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if resume.experience %}
+                    <div class="d-flex gap-3 align-items-center mb-3">
+                        <div style="background:#dbeafe;border-radius:.75rem;padding:.75rem 1rem;text-align:center;min-width:70px">
+                            <div style="font-size:1.25rem;font-weight:800;color:#1e40af">{{ resume.experience }}</div>
+                            <div style="font-size:.7rem;color:#64748b">Yrs</div>
+                        </div>
+                        <div style="font-size:.875rem;color:#475569">{{ resume.experience_details or 'Years of experience' }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if candidate.bio %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 style="font-weight:700;margin-bottom:.75rem">About</h5>
+                        <p style="font-size:.9rem;color:#475569;line-height:1.7">{{ candidate.bio }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

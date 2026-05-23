@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Mock Interview - Interview Prep Tracker{% endblock %}
+
+{% block content %}
+<section class="interview-session-section">
+    <div class="container">
+        <div class="interview-header">
+            <div class="interview-info">
+                <h1>{{ interview.interview_type }}</h1>
+                <span class="badge bg-{{ 'success' if interview.difficulty == 'easy' else 'warning' if interview.difficulty == 'medium' else 'danger' }}">
+                    {{ interview.difficulty|capitalize }}
+                </span>
+            </div>
+            <div class="interview-timer">
+                <i class="bi bi-clock"></i>
+                <span id="timer">00:00</span>
+            </div>
+        </div>
+        
+        <div class="interview-progress">
+            <div class="progress">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <span class="progress-text">Question <span id="currentQ">1</span> of {{ questions|length }}</span>
+        </div>
+        
+        <form method="POST" id="interviewForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="questions-container">
+                {% for question in questions %}
+                <div class="question-card {% if loop.first %}active{% endif %}" data-question="{{ loop.index }}" id="question{{ loop.index }}">
+                    <div class="question-number">
+                        Question {{ loop.index }}
+                    </div>
+                    <div class="question-text">
+                        {{ question.question_text }}
+                    </div>
+                    
+                    <div class="options-list">
+                        {% for option in question.options %}
+                        <label class="option-item">
+                            <input type="radio" name="answer_{{ question.id }}" value="{{ option }}" required>
+                            <span class="option-marker">{{ ['A', 'B', 'C', 'D'][loop.index0] }}</span>
+                            <span class="option-text">{{ option }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="question-nav">
+                        {% if not loop.first %}
+                        <button type="button" class="btn btn-outline-secondary prev-btn" onclick="prevQuestion()">
+                            <i class="bi bi-arrow-left"></i> Previous
+                        </button>
+                        {% endif %}
+                        
+                        {% if loop.last %}
+                        <button type="submit" class="btn btn-success submit-btn">
+                            <i class="bi bi-check-circle"></i> Submit Interview
+                        </button>
+                        {% else %}
+                        <button type="button" class="btn btn-primary next-btn" onclick="nextQuestion()">
+                            Next <i class="bi bi-arrow-right"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+        
+        <div class="question-navigator">
+            {% for question in questions %}
+            <button type="button" class="nav-dot {% if loop.first %}current{% endif %}" onclick="goToQuestion({{ loop.index }})" data-q="{{ loop.index }}">
+                {{ loop.index }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Submit Confirmation Modal -->
+<div class="modal fade" id="submitModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img src="https://img.icons8.com/fluency/96/checked.png" alt="Submit">
+                <h3>Submit Interview?</h3>
+                <p>Make sure you've answered all questions. You won't be able to change your answers after submission.</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Review Answers</button>
+                    <button type="button" class="btn btn-success" onclick="document.getElementById('interviewForm').submit()">
+                        Submit Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentQuestion = 1;
+    const totalQuestions = {{ questions|length }};
+    let seconds = 0;
+    
+    // Timer
+    setInterval(() => {
+        seconds++;
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        document.getElementById('timer').textContent = `${mins}:${secs}`;
+    }, 1000);
+    
+    function updateProgress() {
+        const progress = (currentQuestion / totalQuestions) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        document.getElementById('currentQ').textContent = currentQuestion;
+        
+        // Update nav dots
+        document.querySelectorAll('.nav-dot').forEach(dot => {
+            dot.classList.remove('current');
+            if (parseInt(dot.dataset.q) === currentQuestion) {
+                dot.classList.add('current');
+            }
+        });
+    }
+    
+    function showQuestion(num) {
+        document.querySelectorAll('.question-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        document.getElementById(`question${num}`).classList.add('active');
+        currentQuestion = num;
+        updateProgress();
+    }
+    
+    function nextQuestion() {
+        if (currentQuestion < totalQuestions) {
+            // Mark current as answered if selected
+            const currentCard = document.getElementById(`question${currentQuestion}`);
+            const selected = currentCard.querySelector('input[type="radio"]:checked');
+            if (selected) {
+                document.querySelector(`.nav-dot[data-q="${currentQuestion}"]`).classList.add('answered');
+            }
+            showQuestion(currentQuestion + 1);
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestion > 1) {
+            showQuestion(currentQuestion - 1);
+        }
+    }
+    
+    function goToQuestion(num) {
+        showQuestion(num);
+    }
+    
+    // Mark answered questions
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const qNum = this.closest('.question-card').dataset.question;
+            document.querySelector(`.nav-dot[data-q="${qNum}"]`).classList.add('answered');
+        });
+    });
+    
+    // Confirm before leaving
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+    });
+    
+    // Form submit
+    document.getElementById('interviewForm').addEventListener('submit', function(e) {
+        window.removeEventListener('beforeunload', function() {});
+    });
+</script>
+{% endblock %}

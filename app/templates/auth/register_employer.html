@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Employer Registration - Smart Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+                <div class="row g-0">
+                    <div class="col-md-4 d-none d-md-flex align-items-center text-white p-5" 
+                         style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                        <div>
+                            <h2 class="fw-bold mb-4">Register Your Company</h2>
+                            <p class="lead mb-5">Access top talent powered by our AI-driven matching algorithms.</p>
+                            <ul class="list-unstyled">
+                                <li class="mb-4">
+                                    <h5 class="mb-1 fw-bold">Post Jobs</h5>
+                                    <p class="small mb-0">List your openings to thousands of qualified candidates.</p>
+                                </li>
+                                <li class="mb-4">
+                                    <h5 class="mb-1 fw-bold">AI Matching</h5>
+                                    <p class="small mb-0">Get resumes that actually match your job descriptions.</p>
+                                </li>
+                                <li class="mb-4">
+                                    <h5 class="mb-1 fw-bold">Quality Hires</h5>
+                                    <p class="small mb-0">Use our interview system to filter for the best skills.</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-8 p-5 bg-white">
+                        <h3 class="fw-bold mb-4">Employer Registration Form</h3>
+                        <form method="POST" action="{{ url_for('auth.register_employer') }}" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            <h5 class="text-primary mb-3">Contact Person</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" name="name" class="form-control" placeholder="HR Manager Name" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Official Email</label>
+                                    <input type="email" name="email" class="form-control" placeholder="hr@company.com" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
+                                </div>
+                            </div>
+
+                            <h5 class="text-primary mb-3">Company Details</h5>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Company Name</label>
+                                    <input type="text" name="company_name" class="form-control" placeholder="Acme Inc." required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Industry</label>
+                                    <select name="industry" class="form-select" required>
+                                        <option value="">Select Industry</option>
+                                        <option value="IT">Information Technology</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Manufacturing">Manufacturing</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Company Size</label>
+                                    <select name="company_size" class="form-select" required>
+                                        <option value="1-10">1-10 Employees</option>
+                                        <option value="11-50">11-50 Employees</option>
+                                        <option value="51-200">51-200 Employees</option>
+                                        <option value="201-500">201-500 Employees</option>
+                                        <option value="500+">500+ Employees</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Years in Business</label>
+                                    <input type="number" name="years_in_business" class="form-control" placeholder="e.g. 5" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Website</label>
+                                    <input type="url" name="company_website" class="form-control" placeholder="https://..." required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Company Logo</label>
+                                <input type="file" name="logo" class="form-control" accept="image/*">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Company Description</label>
+                                <textarea name="company_description" class="form-control" rows="3" placeholder="Tell us what your company does..."></textarea>
+                            </div>
+
+                            <h5 class="text-primary mb-3">Security</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="employer_register_password" class="form-control" required>
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle-password="#employer_register_password" aria-label="Toggle password">
+                                            <img src="https://img.icons8.com/?size=100&id=85130&format=png&color=000000" alt="Toggle" style="width:18px;height:18px">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="confirm_password" id="employer_register_confirm_password" class="form-control" required>
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle-password="#employer_register_confirm_password" aria-label="Toggle password">
+                                            <img src="https://img.icons8.com/?size=100&id=85130&format=png&color=000000" alt="Toggle" style="width:18px;height:18px">
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted">Password requirements: at least 8 characters and at least 1 uppercase letter.</small>
+                            </div>
+
+                            <div class="alert alert-info py-2 small mb-4">
+                                <i class="bi bi-info-circle-fill me-2"></i> Note: Employer accounts require administrative approval before you can post jobs.
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-3 mb-4">Submit Registration</button>
+                            <p class="text-center mb-0">Already registered? <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold">Sign In</a></p>
+                            <hr class="my-4">
+                            <p class="text-center small">Looking for a job? <a href="{{ url_for('auth.register') }}" class="text-primary fw-bold">Register as Candidate</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

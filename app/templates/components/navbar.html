@@ -1,0 +1,65 @@
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">
+            <img src="https://img.icons8.com/fluency/48/briefcase.png" alt="Logo" class="brand-icon">
+            <span>Smart<span class="brand-dot">Job</span>Portal</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <img src="https://img.icons8.com/fluency/24/menu.png" alt="Menu" style="width:22px;height:22px;">
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">Home</a>
+                </li>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'candidate' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('candidate.dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('candidate.resume_upload') }}">Resume</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('candidate.jobs') }}">Jobs</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('candidate.interview_history') }}">Interviews</a></li>
+                    {% elif current_user.role == 'employer' and current_user.is_approved %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('employer.dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('employer.my_jobs') }}">My Jobs</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('employer.applicants') }}">Applicants</a></li>
+                    {% elif current_user.role == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.employers') }}">Employers</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.candidates') }}">Candidates</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.jobs') }}">Jobs</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav align-items-center">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
+                            <div class="nav-avatar">{{ current_user.get_initials() }}</div>
+                            <span class="ms-1" style="color:var(--text);font-size:.875rem">{{ current_user.name.split()[0] }}</span>
+                            <span class="role-badge {{ current_user.role }}">{{ current_user.role }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" style="border-radius:.875rem;border:1px solid #e2e8f0;box-shadow:0 20px 40px rgba(0,0,0,.12);min-width:200px;padding:.5rem">
+                            {% if current_user.role == 'candidate' %}
+                                <li><a class="dropdown-item" style="border-radius:.5rem;font-size:.875rem;padding:.625rem .875rem" href="{{ url_for('candidate.profile') }}">
+                                    <img src="https://img.icons8.com/fluency/20/user.png" alt="" style="width:16px;height:16px;margin-right:8px">My Profile</a></li>
+                                <!-- <li><a class="dropdown-item" style="border-radius:.5rem;font-size:.875rem;padding:.625rem .875rem" href="{{ url_for('candidate.analytics') }}">
+                                    <img src="https://img.icons8.com/fluency/20/combo-chart.png" alt="" style="width:16px;height:16px;margin-right:8px">Analytics</a></li> -->
+                            {% elif current_user.role == 'employer' and current_user.is_approved %}
+                                <li><a class="dropdown-item" style="border-radius:.5rem;font-size:.875rem;padding:.625rem .875rem" href="{{ url_for('employer.profile') }}">
+                                    <img src="https://img.icons8.com/fluency/20/company.png" alt="" style="width:16px;height:16px;margin-right:8px">Company Profile</a></li>
+                                <li><a class="dropdown-item" style="border-radius:.5rem;font-size:.875rem;padding:.625rem .875rem" href="{{ url_for('employer.post_job') }}">
+                                    <img src="https://img.icons8.com/fluency/20/plus-math.png" alt="" style="width:16px;height:16px;margin-right:8px">Post a Job</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider" style="margin:.5rem 0"></li>
+                            <li><a class="dropdown-item text-danger" style="border-radius:.5rem;font-size:.875rem;padding:.625rem .875rem" href="{{ url_for('auth.logout') }}">
+                                <img src="https://img.icons8.com/fluency/20/exit.png" alt="" style="width:16px;height:16px;margin-right:8px">Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Sign In</a></li>
+                    <li class="nav-item ms-2"><a class="btn btn-primary btn-sm" href="{{ url_for('auth.register') }}">Get Started</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

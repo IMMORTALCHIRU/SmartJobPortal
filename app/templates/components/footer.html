@@ -1,0 +1,47 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="footer-brand">
+                    <img src="https://img.icons8.com/fluency/32/briefcase.png" alt="" style="vertical-align:middle;margin-right:8px">
+                    SmartJobPortal
+                </div>
+                <p class="footer-desc">Connecting talent with opportunity. AI-powered job matching and interview preparation platform.</p>
+                <div class="d-flex gap-3 mt-3">
+                    <a href="#" style="color:rgba(255,255,255,.5)" title="LinkedIn"><img src="https://img.icons8.com/fluency/24/linkedin.png" alt="LinkedIn" style="width:24px;height:24px;opacity:.6;transition:.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6"></a>
+                    <a href="#" style="color:rgba(255,255,255,.5)" title="Twitter"><img src="https://img.icons8.com/fluency/24/twitter.png" alt="Twitter" style="width:24px;height:24px;opacity:.6;transition:.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6"></a>
+                    <a href="#" style="color:rgba(255,255,255,.5)" title="Facebook"><img src="https://img.icons8.com/fluency/24/facebook.png" alt="Facebook" style="width:24px;height:24px;opacity:.6;transition:.2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6"></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h6 class="footer-title">Candidates</h6>
+                <div class="footer-links">
+                    <a href="{{ url_for('auth.register') }}">Register</a>
+                    <a href="{{ url_for('auth.login') }}">Login</a>
+                    <a href="{{ url_for('main.index') }}#features">Resume Analysis</a>
+                    <a href="{{ url_for('main.index') }}#features">Job Matching</a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h6 class="footer-title">Employers</h6>
+                <div class="footer-links">
+                    <a href="{{ url_for('auth.register_employer') }}">Register Company</a>
+                    <a href="{{ url_for('auth.login') }}">Employer Login</a>
+                    <a href="{{ url_for('main.index') }}#modules">Post Jobs</a>
+                    <a href="{{ url_for('main.index') }}#modules">Find Talent</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <h6 class="footer-title">Contact</h6>
+                <div class="footer-links">
+                    <span><img src="https://img.icons8.com/fluency/20/email.png" alt="" style="width:16px;height:16px;margin-right:6px;opacity:.7">support@smartjobportal.in</span>
+                    <span><img src="https://img.icons8.com/fluency/20/phone.png" alt="" style="width:16px;height:16px;margin-right:6px;opacity:.7">+91 98765 43210</span>
+                    <span><img src="https://img.icons8.com/fluency/20/map-pin.png" alt="" style="width:16px;height:16px;margin-right:6px;opacity:.7">Chennai, India</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; {{ 2026 }} Smart Job Portal. All rights reserved. Built with <img src="https://img.icons8.com/fluency/16/like.png" alt="love" style="width:14px;height:14px;vertical-align:middle"> for job seekers & employers.</span>
+        </div>
+    </div>
+</footer>

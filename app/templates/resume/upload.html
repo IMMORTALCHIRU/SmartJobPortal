@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Resume - Interview Prep Tracker{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 sidebar-col">
+                {% include 'components/sidebar.html' %}
+            </div>
+            
+            <div class="col-lg-10 main-content-col">
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <h1><i class="bi bi-file-earmark-arrow-up"></i> Upload Resume</h1>
+                        <p>Upload your resume to get AI-powered analysis and recommendations</p>
+                    </div>
+                    
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="upload-card">
+                                <form method="POST" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    
+                                    <div class="upload-zone" id="uploadZone">
+                                        <div class="upload-icon">
+                                            <img src="https://img.icons8.com/fluency/96/upload-document.png" alt="Upload">
+                                        </div>
+                                        <h3>Drag & Drop your resume here</h3>
+                                        <p>or click to browse</p>
+                                        <input type="file" name="resume" id="resumeInput" accept=".pdf,.docx" required>
+                                        <span class="file-types">Supported formats: PDF, DOCX (Max 16MB)</span>
+                                    </div>
+                                    
+                                    <div class="selected-file" id="selectedFile" style="display: none;">
+                                        <div class="file-icon">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                        </div>
+                                        <div class="file-info">
+                                            <span class="file-name" id="fileName"></span>
+                                            <span class="file-size" id="fileSize"></span>
+                                        </div>
+                                        <button type="button" class="remove-file" id="removeFile">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadBtn" disabled>
+                                        <i class="bi bi-cloud-upload"></i> Analyze Resume
+                                    </button>
+                                </form>
+                                
+                                <div class="upload-features">
+                                    <h4>What you'll get:</h4>
+                                    <div class="feature-grid">
+                                        <div class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span>Skills extraction</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span>Experience analysis</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span>Resume score</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span>Job recommendations</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span>Skill suggestions</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span>Interview prep tips</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const uploadZone = document.getElementById('uploadZone');
+    const resumeInput = document.getElementById('resumeInput');
+    const selectedFile = document.getElementById('selectedFile');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const uploadBtn = document.getElementById('uploadBtn');
+    
+    uploadZone.addEventListener('click', () => resumeInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            resumeInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    resumeInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    function handleFileSelect(file) {
+        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        
+        if (!validTypes.includes(file.type)) {
+            alert('Please upload a PDF or DOCX file');
+            return;
+        }
+        
+        if (file.size > 16 * 1024 * 1024) {
+            alert('File size must be less than 16MB');
+            return;
+        }
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        uploadZone.style.display = 'none';
+        selectedFile.style.display = 'flex';
+        uploadBtn.disabled = false;
+    }
+    
+    removeFile.addEventListener('click', () => {
+        resumeInput.value = '';
+        uploadZone.style.display = 'block';
+        selectedFile.style.display = 'none';
+        uploadBtn.disabled = true;
+    });
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+</script>
+{% endblock %}
