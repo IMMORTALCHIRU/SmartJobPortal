@@ -163,33 +163,45 @@ class ResumeParserService:
         
         # Skills (max 30 points)
         skill_count = len(resume_data.get('skills', []))
-        score += min(skill_count * 3, 30)
+        skill_points = min(skill_count * 3, 30)
+        score += skill_points
         
         # Education (max 15 points)
-        if resume_data.get('education'):
-            score += 15
+        edu_points = 15 if resume_data.get('education') else 0
+        score += edu_points
         
         # Certifications (max 15 points)
         cert_count = len(resume_data.get('certifications', []))
-        score += min(cert_count * 5, 15)
+        cert_points = min(cert_count * 5, 15)
+        score += cert_points
         
         # Experience (max 20 points)
         exp_years = resume_data.get('experience_years', 0)
-        score += min(exp_years * 2, 20)
+        exp_points = min(exp_years * 2, 20)
+        score += exp_points
         
         # Resume sections (max 20 points)
+        section_points = 0
         if resume_data.get('has_objective'):
-            score += 4
+            section_points += 4
         if resume_data.get('has_projects'):
-            score += 5
+            section_points += 5
         if resume_data.get('has_achievements'):
-            score += 4
+            section_points += 4
         if resume_data.get('has_hobbies'):
-            score += 3
+            section_points += 3
         if resume_data.get('has_declaration'):
-            score += 4
+            section_points += 4
+        score += section_points
         
-        return min(score, 100)
+        breakdown = {
+            'skills': round((skill_points / 30) * 100),
+            'education': round((edu_points / 15) * 100),
+            'experience': round((exp_points / 20) * 100),
+            'keywords': min(round(((skill_count + cert_count) / 15) * 100), 100)
+        }
+        
+        return min(score, 100), breakdown
     
     @staticmethod
     def determine_candidate_level(page_count, experience_years):
@@ -309,6 +321,8 @@ class ResumeParserService:
             **sections
         }
         
-        resume_data['resume_score'] = cls.calculate_resume_score(resume_data)
+        score, breakdown = cls.calculate_resume_score(resume_data)
+        resume_data['resume_score'] = score
+        resume_data['score_breakdown'] = breakdown
         
         return resume_data

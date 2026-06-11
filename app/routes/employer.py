@@ -117,7 +117,44 @@ def post_job():
             'num_questions': num_questions,
             'difficulty': difficulty,
         }
-        JobPosting.create(current_user.id, job_data)
+        job = JobPosting.create(current_user.id, job_data)
+
+        # Process and save custom questions
+        custom_questions = request.form.getlist('custom_question[]')
+        custom_opt_a = request.form.getlist('custom_opt_a[]')
+        custom_opt_b = request.form.getlist('custom_opt_b[]')
+        custom_opt_c = request.form.getlist('custom_opt_c[]')
+        custom_opt_d = request.form.getlist('custom_opt_d[]')
+        custom_answers = request.form.getlist('custom_answer[]')
+        
+        from app.models.question import Question
+        for i in range(len(custom_questions)):
+            q_text = custom_questions[i].strip()
+            if q_text:
+                opts = [
+                    custom_opt_a[i].strip() if i < len(custom_opt_a) else '',
+                    custom_opt_b[i].strip() if i < len(custom_opt_b) else '',
+                    custom_opt_c[i].strip() if i < len(custom_opt_c) else '',
+                    custom_opt_d[i].strip() if i < len(custom_opt_d) else ''
+                ]
+                opts = [o for o in opts if o]
+                correct_idx = int(custom_answers[i]) if i < len(custom_answers) and custom_answers[i].isdigit() else 0
+                correct_ans = opts[correct_idx] if correct_idx < len(opts) else (opts[0] if opts else '')
+                
+                if len(opts) >= 2:
+                    q_data = {
+                        'question_text': q_text,
+                        'question_type': 'mcq',
+                        'options': opts,
+                        'correct_answer': correct_ans,
+                        'explanation': 'Custom employer question',
+                        'difficulty': difficulty,
+                        'category': field,
+                        'tags': [f"job_{job.id}"],
+                        'points': 10
+                    }
+                    Question.create(q_data)
+
         flash(f'Job "{title}" posted successfully!', 'success')
         return redirect(url_for('employer.my_jobs'))
 
@@ -271,7 +308,8 @@ def update_status(app_id):
                     job.field or job.title,
                     resume.skills if resume else [],
                     difficulty,
-                    num_q
+                    num_q,
+                    job_id=job.id
                 )
                 if questions:
                     interview_data = {

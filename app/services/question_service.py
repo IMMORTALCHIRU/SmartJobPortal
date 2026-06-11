@@ -4,8 +4,26 @@ from app import mongo
 class QuestionService:
     
     @staticmethod
-    def get_questions_for_interview(interview_type, skills=None, difficulty='medium', count=10):
+    def get_questions_for_interview(interview_type, skills=None, difficulty='medium', count=10, job_id=None):
         """Get questions for a mock interview"""
+        questions = []
+        
+        # 1. Fetch custom questions for this job if job_id is provided
+        if job_id:
+            try:
+                from app import mongo
+                custom_cursor = mongo.db.questions.find({'tags': f"job_{job_id}"}).limit(count)
+                custom_questions = [Question(q) for q in custom_cursor]
+                questions.extend(custom_questions)
+            except Exception:
+                pass
+                
+        # If we have enough custom questions, return them
+        if len(questions) >= count:
+            return questions[:count]
+            
+        remaining_count = count - len(questions)
+
         # Map interview type to question category with fallbacks for all job fields
         category_mapping = {
             'Data Structures & Algorithms': 'DSA',
@@ -31,29 +49,30 @@ class QuestionService:
         category = category_mapping.get(interview_type, 'Python')  # Default to Python
         
         # Try to get questions by category at requested difficulty
-        questions = []
         try:
-            questions = Question.get_by_category(category, difficulty, count)
+            category_questions = Question.get_by_category(category, difficulty, remaining_count)
+            questions.extend(category_questions)
         except Exception:
             pass
         
+        remaining_count = count - len(questions)
         # If not enough questions, search by tags (skills)
-        if len(questions) < count and skills:
+        if remaining_count > 0 and skills:
             try:
-                additional = Question.get_by_tags(skills, difficulty, count - len(questions))
+                additional = Question.get_by_tags(skills, difficulty, remaining_count)
                 questions.extend(additional)
             except Exception:
                 pass
         
+        remaining_count = count - len(questions)
         # If still not enough, try to get questions from any difficulty level
-        if len(questions) < count:
+        if remaining_count > 0:
             try:
                 from app import mongo
-                remaining = count - len(questions)
                 # Try to get more questions without difficulty restriction
                 all_questions = list(mongo.db.questions.aggregate([
                     {'$match': {}},
-                    {'$sample': {'size': min(remaining, 100)}}
+                    {'$sample': {'size': min(remaining_count, 100)}}
                 ]))
                 questions.extend([Question(q) for q in all_questions])
             except Exception:

@@ -220,7 +220,8 @@ def start_interview(job_id):
         job.field or job.title,
         resume.skills if resume else [],
         job.difficulty,
-        job.num_questions
+        job.num_questions,
+        job_id=job.id
     )
 
     if not questions:

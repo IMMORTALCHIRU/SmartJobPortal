@@ -25,6 +25,7 @@ class Resume:
         self.has_projects = resume_data.get('has_projects', False)
         self.raw_text = resume_data.get('raw_text', '')
         self.page_count = resume_data.get('page_count', 1)
+        self.score_breakdown = resume_data.get('score_breakdown', {})
     
     @staticmethod
     def create(user_id, resume_data):
@@ -75,5 +76,6 @@ class Resume:
             'candidate_level': self.candidate_level,
             'predicted_field': self.predicted_field,
             'recommended_skills': self.recommended_skills,
-            'page_count': self.page_count
+            'page_count': self.page_count,
+            'score_breakdown': self.score_breakdown
         }
