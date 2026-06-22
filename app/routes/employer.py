@@ -39,6 +39,8 @@ def allowed_image(filename):
 def dashboard():
     jobs = JobPosting.get_by_employer(current_user.id)
     total_applications = Application.count_by_employer(current_user.id)
+    shortlisted_count = Application.count_by_employer_and_status(current_user.id, Application.STATUS_SHORTLISTED)
+    interviews_done = Application.count_by_employer_and_status(current_user.id, Application.STATUS_INTERVIEW_COMPLETED)
     active_jobs = sum(1 for j in jobs if j.is_active)
     recent_applications = list(mongo.db.applications.find(
         {'employer_id': ObjectId(current_user.id)}
@@ -57,11 +59,24 @@ def dashboard():
             'resume': resume,
         })
 
+    status_labels = ['Applied', 'Interview Pending', 'Interviews Done', 'Shortlisted', 'Rejected']
+    status_values = [
+        Application.count_by_employer_and_status(current_user.id, Application.STATUS_APPLIED),
+        Application.count_by_employer_and_status(current_user.id, Application.STATUS_INTERVIEW_PENDING),
+        interviews_done,
+        shortlisted_count,
+        Application.count_by_employer_and_status(current_user.id, Application.STATUS_REJECTED),
+    ]
+
     return render_template('employer/dashboard.html',
                            jobs=jobs,
                            total_applications=total_applications,
                            active_jobs=active_jobs,
-                           recent_applications=enriched_apps)
+                           shortlisted=shortlisted_count,
+                           interviews_done=interviews_done,
+                           recent_applications=enriched_apps,
+                           app_chart_labels=status_labels,
+                           app_chart_values=status_values)
 
 
 @employer_bp.route('/post-job', methods=['GET', 'POST'])

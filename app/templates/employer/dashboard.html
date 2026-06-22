@@ -24,11 +24,11 @@
             </div>
             <div class="stat-card-widget">
                 <div class="stat-widget-icon warning"><img src="https://img.icons8.com/fluency/28/ok.png" alt=""></div>
-                <div><div class="stat-widget-number">0</div><div class="stat-widget-label">Shortlisted</div></div>
+                <div><div class="stat-widget-number">{{ shortlisted }}</div><div class="stat-widget-label">Shortlisted</div></div>
             </div>
             <div class="stat-card-widget">
                 <div class="stat-widget-icon purple"><img src="https://img.icons8.com/fluency/28/questions.png" alt=""></div>
-                <div><div class="stat-widget-number">0</div><div class="stat-widget-label">Interviews Done</div></div>
+                <div><div class="stat-widget-number">{{ interviews_done }}</div><div class="stat-widget-label">Interviews Done</div></div>
             </div>
         </div>
         <div class="row g-4">
@@ -110,8 +110,11 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-const appData = null;
-if(appData) {
+const appData = {
+    labels: {{ app_chart_labels | tojson }},
+    values: {{ app_chart_values | tojson }}
+};
+if(appData && appData.values.some(v => v > 0)) {
     new Chart(document.getElementById('appChart'), {
         type: 'doughnut',
         data: { labels: appData.labels, datasets: [{ data: appData.values, backgroundColor: ['#3b82f6','#059669','#d97706','#dc2626','#7c3aed'] }] },

@@ -89,6 +89,13 @@ class Application:
         return mongo.db.applications.count_documents({'employer_id': ObjectId(employer_id)})
 
     @staticmethod
+    def count_by_employer_and_status(employer_id, status):
+        return mongo.db.applications.count_documents({
+            'employer_id': ObjectId(employer_id),
+            'status': status
+        })
+
+    @staticmethod
     def count_by_candidate(candidate_id):
         return mongo.db.applications.count_documents({'candidate_id': ObjectId(candidate_id)})
 
