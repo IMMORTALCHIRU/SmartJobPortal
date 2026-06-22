@@ -24,11 +24,11 @@
             </div>
             <div class="stat-card-widget">
                 <div class="stat-widget-icon warning"><img src="https://img.icons8.com/fluency/28/ok.png" alt=""></div>
-                <div><div class="stat-widget-number">{{ shortlisted }}</div><div class="stat-widget-label">Shortlisted</div></div>
+                <div><div class="stat-widget-number">{{ shortlisted or 0 }}</div><div class="stat-widget-label">Shortlisted</div></div>
             </div>
             <div class="stat-card-widget">
                 <div class="stat-widget-icon purple"><img src="https://img.icons8.com/fluency/28/questions.png" alt=""></div>
-                <div><div class="stat-widget-number">{{ interviews_done }}</div><div class="stat-widget-label">Interviews Done</div></div>
+                <div><div class="stat-widget-number">{{ interviews_done or 0 }}</div><div class="stat-widget-label">Interviews Done</div></div>
             </div>
         </div>
         <div class="row g-4">

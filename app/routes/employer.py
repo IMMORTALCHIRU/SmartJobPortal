@@ -38,22 +38,38 @@ def allowed_image(filename):
 @employer_required
 def dashboard():
     jobs = JobPosting.get_by_employer(current_user.id)
-    total_applications = Application.count_by_employer(current_user.id)
-    shortlisted_count = Application.count_by_employer_and_status(current_user.id, Application.STATUS_SHORTLISTED)
-    interviews_done = Application.count_by_employer_and_status(current_user.id, Application.STATUS_INTERVIEW_COMPLETED)
+    applications = Application.get_by_employer(current_user.id)
+
+    # Normalize status strings and compute dashboard counts from actual application objects.
+    def normalize_status(value):
+        return str(value).strip().lower() if value is not None else ''
+
+    status_counts = {
+        Application.STATUS_APPLIED: 0,
+        Application.STATUS_INTERVIEW_PENDING: 0,
+        Application.STATUS_INTERVIEW_COMPLETED: 0,
+        Application.STATUS_SHORTLISTED: 0,
+        Application.STATUS_REJECTED: 0,
+    }
+    for app in applications:
+        status = normalize_status(app.status)
+        if status in status_counts:
+            status_counts[status] += 1
+
+    total_applications = len(applications)
+    shortlisted_count = status_counts[Application.STATUS_SHORTLISTED]
+    interviews_done = status_counts[Application.STATUS_INTERVIEW_COMPLETED]
     active_jobs = sum(1 for j in jobs if j.is_active)
-    recent_applications = list(mongo.db.applications.find(
-        {'employer_id': ObjectId(current_user.id)}
-    ).sort('applied_at', -1).limit(10))
+    recent_applications = applications[:10]
 
     # Enrich recent apps with candidate and job info
     enriched_apps = []
     for app in recent_applications:
-        candidate = User.get_by_id(str(app['candidate_id']))
-        job = JobPosting.get_by_id(str(app['job_id']))
-        resume = Resume.get_by_id(str(app.get('resume_id', ''))) if app.get('resume_id') else None
+        candidate = User.get_by_id(app.candidate_id)
+        job = JobPosting.get_by_id(app.job_id)
+        resume = Resume.get_by_id(app.resume_id) if app.resume_id else None
         enriched_apps.append({
-            'application': Application(app),
+            'application': app,
             'candidate': candidate,
             'job': job,
             'resume': resume,
@@ -61,11 +77,11 @@ def dashboard():
 
     status_labels = ['Applied', 'Interview Pending', 'Interviews Done', 'Shortlisted', 'Rejected']
     status_values = [
-        Application.count_by_employer_and_status(current_user.id, Application.STATUS_APPLIED),
-        Application.count_by_employer_and_status(current_user.id, Application.STATUS_INTERVIEW_PENDING),
+        status_counts[Application.STATUS_APPLIED],
+        status_counts[Application.STATUS_INTERVIEW_PENDING],
         interviews_done,
         shortlisted_count,
-        Application.count_by_employer_and_status(current_user.id, Application.STATUS_REJECTED),
+        status_counts[Application.STATUS_REJECTED],
     ]
 
     return render_template('employer/dashboard.html',
